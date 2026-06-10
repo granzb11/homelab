@@ -1,0 +1,4 @@
+# Kubernetes secrets — keep credentials out of git
+k8s/secrets/
+*.credentials.yaml
+k8s/manifests/icloud-sync.yaml

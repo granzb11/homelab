@@ -1,0 +1,62 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@theme {
+  --color-moss: oklch(0.35 0.11 140);
+  --color-moss-dark: oklch(0.27 0.09 140);
+  --color-moss-tint: oklch(0.94 0.04 140);
+
+  --color-gold: oklch(0.65 0.15 60);
+  --color-gold-tint: oklch(0.93 0.04 60);
+
+  --color-ink: oklch(0.12 0.015 140);
+  --color-ink-muted: oklch(0.44 0.015 140);
+  --color-ink-faint: oklch(0.88 0.004 140);
+
+  --color-panel: oklch(0.975 0.004 140);
+}
+
+@theme inline {
+  --font-display: var(--font-spectral), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+  --font-sans: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+body {
+  background-color: oklch(1 0 0);
+  color: oklch(0.12 0.015 140);
+  font-family: var(--font-mono);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a,
+  button,
+  input,
+  select,
+  textarea {
+    transition-property: color, background-color, border-color, opacity, box-shadow;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.25, 0, 0, 1);
+  }
+}
+
+@keyframes pill-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); }
+  70%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes pill-release {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.88); }
+  100% { transform: scale(1); }
+}
+
+/* Custom focus ring using moss color */
+:focus-visible {
+  outline: 2px solid oklch(0.35 0.11 140);
+  outline-offset: 2px;
+}

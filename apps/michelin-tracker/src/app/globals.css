@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Botanical Workbench — four named roles */
+  --color-moss: oklch(0.35 0.11 140);
+  --color-moss-light: oklch(0.92 0.03 140);
+  --color-moss-mid: oklch(0.55 0.08 140);
+  --color-amber: oklch(0.65 0.15 55);
+  --color-amber-light: oklch(0.93 0.04 55);
+  --color-ink: oklch(0.12 0.015 140);
+  --color-muted: oklch(0.50 0.010 140);
+  --color-surface: oklch(1.000 0.000 0);
+  --color-panel: oklch(0.97 0.005 140);
+  --color-border: oklch(0.88 0.008 140);
+
+  --font-display: var(--font-fraunces);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+}

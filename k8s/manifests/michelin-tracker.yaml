@@ -1,0 +1,176 @@
+# Secret is NOT stored here — create it once manually and never commit it:
+#
+#   kubectl create secret generic michelin-db-secret \
+#     --namespace michelin-tracker \
+#     --from-literal=POSTGRES_PASSWORD=<your-password> \
+#     --from-literal=DATABASE_URL="postgresql://michelin:<your-password>@michelin-postgres:5432/michelin_tracker" \
+#     --dry-run=client -o yaml | kubectl apply -f -
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: michelin-tracker
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: michelin-postgres-pvc
+  namespace: michelin-tracker
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: michelin-postgres
+  namespace: michelin-tracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: michelin-postgres
+  template:
+    metadata:
+      labels:
+        app: michelin-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: michelin
+            - name: POSTGRES_DB
+              value: michelin_tracker
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: michelin-db-secret
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "michelin", "-d", "michelin_tracker"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: michelin-postgres-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: michelin-postgres
+  namespace: michelin-tracker
+spec:
+  selector:
+    app: michelin-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: michelin-tracker
+  namespace: michelin-tracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: michelin-tracker
+  template:
+    metadata:
+      labels:
+        app: michelin-tracker
+    spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z michelin-postgres 5432; do
+                echo "waiting for postgres..."; sleep 2;
+              done
+      containers:
+        - name: michelin-tracker
+          image: michelin-tracker:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: michelin-db-secret
+                  key: DATABASE_URL
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: michelin-tracker
+  namespace: michelin-tracker
+spec:
+  selector:
+    app: michelin-tracker
+  ports:
+    - port: 80
+      targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: michelin-tracker
+  namespace: michelin-tracker
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: michelin.home
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: michelin-tracker
+                port:
+                  number: 80
+    - host: michelin.granzb.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: michelin-tracker
+                port:
+                  number: 80

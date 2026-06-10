@@ -1,0 +1,53 @@
+# Secret is NOT stored here — create it once manually and never commit it:
+#
+#   kubectl create secret generic tunnel-token \
+#     --namespace cloudflared \
+#     --from-literal=token=<token-from-cloudflare-dashboard> \
+#     --dry-run=client -o yaml | kubectl apply -f -
+#
+# Find the token at: Zero Trust → Networks → Tunnels → homelab → Configure → Install connector
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cloudflared
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared
+  namespace: cloudflared
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloudflared
+  template:
+    metadata:
+      labels:
+        app: cloudflared
+    spec:
+      containers:
+        - name: cloudflared
+          image: cloudflare/cloudflared:latest
+          args:
+            - tunnel
+            - --no-autoupdate
+            - run
+            - --token
+            - $(TUNNEL_TOKEN)
+          env:
+            - name: TUNNEL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: tunnel-token
+                  key: token
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi

@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Friend {
+  id               String         @id @default(cuid())
+  name             String
+  notes            String?
+  avatarUrl        String?
+  createdAt        DateTime       @default(now())
+  events           Event[]
+  reminders        Reminder[]
+  relationshipsAs  Relationship[] @relation("RelationshipA")
+  relationshipsAs2 Relationship[] @relation("RelationshipB")
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  title       String?
+  eventType   String?
+  location    String?
+  lat         Float?
+  lng         Float?
+  city        String?
+  startDate   DateTime
+  endDate     DateTime?
+  whoTraveled String?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  friends     Friend[]
+}
+
+model Relationship {
+  id        String   @id @default(cuid())
+  type      String
+  createdAt DateTime @default(now())
+  friendAId String
+  friendBId String
+  friendA   Friend   @relation("RelationshipA", fields: [friendAId], references: [id], onDelete: Cascade)
+  friendB   Friend   @relation("RelationshipB", fields: [friendBId], references: [id], onDelete: Cascade)
+}
+
+model Reminder {
+  id            String   @id @default(cuid())
+  thresholdDays Int
+  createdAt     DateTime @default(now())
+  friendId      String
+  friend        Friend   @relation(fields: [friendId], references: [id], onDelete: Cascade)
+}

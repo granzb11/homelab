@@ -1,0 +1,49 @@
+version: "3.9"
+
+# Merge this service block into your existing homelab docker-compose.yml
+# or run standalone with: docker-compose up -d
+
+services:
+  michelin-tracker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: michelin-tracker
+    restart: unless-stopped
+    ports:
+      - "3010:3000"
+    environment:
+      DATABASE_URL: "postgresql://michelin:${MICHELIN_DB_PASSWORD}@postgres:5432/michelin_tracker"
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - homelab
+
+  # Remove this block if Postgres is already running in your homelab
+  postgres:
+    image: postgres:16-alpine
+    container_name: michelin-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: michelin
+      POSTGRES_PASSWORD: ${MICHELIN_DB_PASSWORD}
+      POSTGRES_DB: michelin_tracker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U michelin -d michelin_tracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    # Change to `external: true` to attach to an existing homelab network
+    driver: bridge
+
+volumes:
+  postgres_data:

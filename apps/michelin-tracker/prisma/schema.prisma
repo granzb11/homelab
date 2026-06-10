@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PairingType {
+  WINE_PAIRING
+  RESERVED_WINE_PAIRING
+  BEVERAGE_PAIRING
+  NONE
+}
+
+enum PriceLevel {
+  ONE
+  TWO
+  THREE
+  FOUR
+}
+
+model Restaurant {
+  id            Int         @id @default(autoincrement())
+  name          String
+  city          String
+  country       String
+  stars         Int
+  cuisine       String
+  dateVisited   DateTime
+  rating        Float
+  price         PriceLevel
+  pairingType   PairingType @default(NONE)
+  foodCost      Float?
+  pairingPrice  Float?
+  highlightDish String?
+  notes         String?
+  goBack        Boolean     @default(false)
+  photoLink     String?
+  latitude      Float?
+  longitude     Float?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([name, dateVisited])
+  @@index([stars])
+}
