@@ -240,6 +240,8 @@ export function HangoutForm({ friends, defaultFriendId, defaultValues }: Hangout
           <option>Dinner</option>
           <option>Lunch</option>
           <option>Coffee</option>
+          <option>Hotel</option>
+          <option>Airbnb</option>
           <option>Trip</option>
           <option>Vacation</option>
           <option>Concert</option>

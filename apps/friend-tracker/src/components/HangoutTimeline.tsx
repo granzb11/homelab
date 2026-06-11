@@ -50,7 +50,7 @@ export function HangoutTimeline({ events, currentFriendId }: { events: FriendEve
                     <span className="text-xs bg-moss/10 text-moss px-2 py-0.5 rounded-full">{ev.eventType}</span>
                   )}
                 </div>
-                {ev.title && (
+                {ev.title && ev.eventType !== "Hotel" && ev.eventType !== "Airbnb" && (
                   <p className="text-sm font-medium text-ink mt-0.5">{ev.title}</p>
                 )}
                 {(ev.location || ev.city) && (
