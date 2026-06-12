@@ -92,8 +92,8 @@ export function calculateDailySpending(
 }
 
 export function getDetailedCostsByCategory(
-  bookings: (BookingData & { id: string; name?: string })[],
-  excursions: (ExcursionData & { id: string; name?: string })[]
+  bookings: (BookingData & { id: string; name?: string; startDate?: Date | string | null })[],
+  excursions: (ExcursionData & { id: string; name?: string; date?: Date | string | null })[]
 ): { [category: string]: DetailedItem[] } {
   const categorizedItems: { [category: string]: DetailedItem[] } = {};
 
