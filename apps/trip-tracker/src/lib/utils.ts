@@ -104,7 +104,7 @@ export function getDetailedCostsByCategory(
     if (!categorizedItems[b.type]) categorizedItems[b.type] = [];
     categorizedItems[b.type].push({
       id: b.id,
-      name: b.name || "Unnamed Booking",
+      name: (b as any).title || b.name || "Unnamed Booking",
       type: b.type,
       price,
       date: b.startDate ? new Date(b.startDate).toISOString().split("T")[0] : "—",
@@ -118,7 +118,7 @@ export function getDetailedCostsByCategory(
     if (!categorizedItems[e.type]) categorizedItems[e.type] = [];
     categorizedItems[e.type].push({
       id: e.id,
-      name: e.name || "Unnamed Excursion",
+      name: (e as any).title || e.name || "Unnamed Excursion",
       type: e.type,
       price,
       date: e.date ? new Date(e.date).toISOString().split("T")[0] : "—",
@@ -147,7 +147,7 @@ export function getDetailedDailySpending(
     if (!dailyItems[key]) dailyItems[key] = [];
     dailyItems[key].push({
       id: b.id,
-      name: b.name || "Unnamed Booking",
+      name: (b as any).title || b.name || "Unnamed Booking",
       type: b.type,
       price,
       date: key,
@@ -162,7 +162,7 @@ export function getDetailedDailySpending(
     if (!dailyItems[key]) dailyItems[key] = [];
     dailyItems[key].push({
       id: e.id,
-      name: e.name || "Unnamed Excursion",
+      name: (e as any).title || e.name || "Unnamed Excursion",
       type: e.type,
       price,
       date: key,
