@@ -204,8 +204,13 @@ export default function FinancialDashboard({
                     <span className="text-sm font-medium text-ink">{formatPrice(cost, currency)}</span>
                   </button>
                   {isExpanded && items.length > 0 && (
-                    <div className="mt-2 ml-4 border-l-2 border-ink-faint pl-4 py-2 bg-panel rounded">
-                      <table className="w-full text-sm">
+                    <div className="mt-2 ml-4 border-l-2 border-ink-faint pl-4 py-2 bg-panel rounded overflow-x-auto">
+                      <table className="w-full text-sm table-fixed">
+                        <colgroup>
+                          <col className="w-1/2" />
+                          <col className="w-1/4" />
+                          <col className="w-1/4" />
+                        </colgroup>
                         <thead>
                           <tr className="border-b border-ink-faint">
                             <th className="text-left py-2 font-medium text-ink-muted text-xs">Item</th>
@@ -216,11 +221,11 @@ export default function FinancialDashboard({
                         <tbody>
                           {items.map((item) => (
                             <tr key={item.id} className="border-b border-ink-faint hover:bg-ink-faint/30">
-                              <td className="py-2 text-ink">{item.name}</td>
-                              <td className="py-2 text-ink-muted text-xs">
+                              <td className="py-2 text-ink break-words">{item.name}</td>
+                              <td className="py-2 text-ink-muted text-xs whitespace-nowrap">
                                 {item.date === "—" ? "—" : new Date(item.date + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                               </td>
-                              <td className="py-2 text-right text-ink font-medium">{formatPrice(item.price, currency)}</td>
+                              <td className="py-2 text-right text-ink font-medium whitespace-nowrap">{formatPrice(item.price, currency)}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -256,8 +261,13 @@ export default function FinancialDashboard({
                     <span className="text-sm font-medium text-ink">{formatPrice(dailyCost, currency)}</span>
                   </button>
                   {isExpanded && items.length > 0 && (
-                    <div className="mt-2 ml-4 border-l-2 border-ink-faint pl-4 py-2 bg-panel rounded">
-                      <table className="w-full text-sm">
+                    <div className="mt-2 ml-4 border-l-2 border-ink-faint pl-4 py-2 bg-panel rounded overflow-x-auto">
+                      <table className="w-full text-sm table-fixed">
+                        <colgroup>
+                          <col className="w-1/2" />
+                          <col className="w-1/4" />
+                          <col className="w-1/4" />
+                        </colgroup>
                         <thead>
                           <tr className="border-b border-ink-faint">
                             <th className="text-left py-2 font-medium text-ink-muted text-xs">Item</th>
@@ -268,13 +278,13 @@ export default function FinancialDashboard({
                         <tbody>
                           {items.map((item) => (
                             <tr key={item.id} className="border-b border-ink-faint hover:bg-ink-faint/30">
-                              <td className="py-2 text-ink">{item.name}</td>
+                              <td className="py-2 text-ink break-words">{item.name}</td>
                               <td className="py-2 text-ink-muted text-xs">
-                                <span className="inline-block px-2 py-0.5 bg-gold/20 text-gold rounded text-xs">
+                                <span className="inline-block px-2 py-0.5 bg-gold/20 text-gold rounded text-xs whitespace-nowrap">
                                   {item.type.replace(/_/g, " ")}
                                 </span>
                               </td>
-                              <td className="py-2 text-right text-ink font-medium">{formatPrice(item.price, currency)}</td>
+                              <td className="py-2 text-right text-ink font-medium whitespace-nowrap">{formatPrice(item.price, currency)}</td>
                             </tr>
                           ))}
                         </tbody>
