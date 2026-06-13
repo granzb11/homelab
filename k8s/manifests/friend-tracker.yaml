@@ -15,6 +15,18 @@ spec:
     requests:
       storage: 2Gi
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-pvc
+  namespace: friend-tracker
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -112,13 +124,20 @@ spec:
             secretKeyRef:
               name: friend-tracker-db-secret
               key: DATABASE_URL
+        volumeMounts:
+        - name: media-storage
+          mountPath: /data/uploads
         resources:
           requests:
             cpu: 100m
-            memory: 256Mi
-          limits:
-            cpu: 500m
             memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 1500Mi
+      volumes:
+      - name: media-storage
+        persistentVolumeClaim:
+          claimName: media-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -132,11 +151,16 @@ spec:
   - port: 3000
     targetPort: 3000
 ---
+# Local access — no auth required
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: friend-tracker
+  name: friend-tracker-local
   namespace: friend-tracker
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "500m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
 spec:
   ingressClassName: nginx
   rules:
@@ -150,6 +174,23 @@ spec:
             name: friend-tracker
             port:
               number: 3000
+---
+# Public access — protected by oauth2-proxy
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: friend-tracker-public
+  namespace: friend-tracker
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "500m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.oauth2-proxy.svc.cluster.local:4180/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.granzb.com/oauth2/start?rd=https://$host$request_uri"
+    nginx.ingress.kubernetes.io/auth-response-headers: "X-Auth-Request-User,X-Auth-Request-Email,X-Auth-Request-Access-Token"
+spec:
+  ingressClassName: nginx
+  rules:
   - host: friends.granzb.com
     http:
       paths:

@@ -20,6 +20,7 @@ export default async function FriendDetailPage({
       where: { id },
       include: {
         events: {
+          where: { status: "logged" },
           orderBy: { startDate: "desc" },
           include: { friends: { select: { id: true, name: true } } },
         },
@@ -46,8 +47,8 @@ export default async function FriendDetailPage({
   const timelineEvents = friend.events.map((ev) => ({
     id: ev.id,
     title: ev.title,
-    startDate: ev.startDate.toISOString(),
-    endDate: ev.endDate?.toISOString() ?? null,
+    startDate: ev.startDate.toISOString().split("T")[0],
+    endDate: ev.endDate?.toISOString().split("T")[0] ?? null,
     eventType: ev.eventType,
     location: ev.location,
     city: ev.city,

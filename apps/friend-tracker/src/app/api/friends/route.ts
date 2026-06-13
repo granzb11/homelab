@@ -5,7 +5,7 @@ import { NextRequest } from "next/server";
 export async function GET() {
   const friends = await prisma.friend.findMany({
     include: {
-      events: { orderBy: { startDate: "desc" }, take: 1 },
+      events: { where: { status: "logged" }, orderBy: { startDate: "desc" }, take: 1 },
     },
     orderBy: { name: "asc" },
   });

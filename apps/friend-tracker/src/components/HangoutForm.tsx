@@ -117,6 +117,8 @@ async function lookupZip(zip: string): Promise<string | null> {
 interface HangoutFormProps {
   friends: Friend[];
   defaultFriendId?: string;
+  /** "plan" creates a tentative trip (status=planned); "log" records a real hangout */
+  mode?: "plan" | "log";
   /** Pre-populated values for edit mode */
   defaultValues?: {
     id: string;
@@ -132,10 +134,11 @@ interface HangoutFormProps {
   };
 }
 
-export function HangoutForm({ friends, defaultFriendId, defaultValues }: HangoutFormProps) {
+export function HangoutForm({ friends, defaultFriendId, defaultValues, mode = "log" }: HangoutFormProps) {
   const router = useRouter();
   const today = new Date().toISOString().split("T")[0];
   const isEdit = !!defaultValues;
+  const isPlan = mode === "plan";
 
   const [friendIds, setFriendIds] = useState<string[]>(
     defaultValues?.friendIds ?? (defaultFriendId ? [defaultFriendId] : [])
@@ -148,7 +151,7 @@ export function HangoutForm({ friends, defaultFriendId, defaultValues }: Hangout
   const [zipResolved, setZipResolved] = useState("");
   const [zipLooking, setZipLooking] = useState(false);
   const [title, setTitle] = useState(defaultValues?.title ?? "");
-  const [eventType, setEventType] = useState(defaultValues?.eventType ?? "");
+  const [eventType, setEventType] = useState(defaultValues?.eventType ?? (mode === "plan" ? "Trip" : ""));
   const [city, setCity] = useState(defaultValues?.city ?? "");
   const [whoTraveled, setWhoTraveled] = useState(defaultValues?.whoTraveled ?? "");
   const [saving, setSaving] = useState(false);
@@ -171,13 +174,13 @@ export function HangoutForm({ friends, defaultFriendId, defaultValues }: Hangout
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (friendIds.length === 0 || !startDate) {
-      setError("Please select at least one friend and a start date.");
+    if (!startDate || (!isPlan && friendIds.length === 0)) {
+      setError(isPlan ? "Please set a target date." : "Please select at least one friend and a start date.");
       return;
     }
     setSaving(true); setError("");
 
-    const payload = { friendIds, startDate, endDate: endDate || null, notes, location, eventType, city, whoTraveled, title };
+    const payload = { friendIds, startDate, endDate: endDate || null, notes, location, eventType, city, whoTraveled, title, status: isPlan ? "planned" : "logged" };
 
     const res = isEdit
       ? await fetch(`/api/events/${defaultValues!.id}`, {
@@ -195,6 +198,8 @@ export function HangoutForm({ friends, defaultFriendId, defaultValues }: Hangout
 
     if (isEdit) {
       router.back();
+    } else if (isPlan) {
+      router.push("/");
     } else if (friendIds.length === 1) {
       router.push(`/friends/${friendIds[0]}`);
     } else {
@@ -223,6 +228,7 @@ export function HangoutForm({ friends, defaultFriendId, defaultValues }: Hangout
       <div>
         <label className="block text-xs font-medium text-ink-muted mb-1.5">
           Friends{" "}
+          {isPlan && friendIds.length === 0 && <span className="text-ink-muted/60">(optional)</span>}
           {friendIds.length > 0 && (
             <span className="text-moss">({friendIds.length} selected)</span>
           )}
@@ -252,7 +258,7 @@ export function HangoutForm({ friends, defaultFriendId, defaultValues }: Hangout
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-ink-muted mb-1.5">Start date</label>
+          <label className="block text-xs font-medium text-ink-muted mb-1.5">{isPlan ? "Target date" : "Start date"}</label>
           <input
             type="date"
             value={startDate}
@@ -342,7 +348,7 @@ export function HangoutForm({ friends, defaultFriendId, defaultValues }: Hangout
           disabled={saving}
           className="bg-moss text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-moss-dark disabled:opacity-50"
         >
-          {saving ? "Saving…" : isEdit ? "Save changes" : "Log hangout"}
+          {saving ? "Saving…" : isEdit ? "Save changes" : isPlan ? "Save plan" : "Log hangout"}
         </button>
         {isEdit && (
           <button

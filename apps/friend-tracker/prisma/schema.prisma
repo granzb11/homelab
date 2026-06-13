@@ -20,8 +20,9 @@ model Friend {
 }
 
 model Event {
-  id          String    @id @default(cuid())
+  id          String       @id @default(cuid())
   title       String?
+  status      String       @default("logged")
   eventType   String?
   location    String?
   lat         Float?
@@ -31,8 +32,18 @@ model Event {
   endDate     DateTime?
   whoTraveled String?
   notes       String?
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime     @default(now())
   friends     Friend[]
+  photos      EventPhoto[]
+}
+
+model EventPhoto {
+  id        String   @id @default(cuid())
+  eventId   String
+  dataUrl   String
+  caption   String?
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model Relationship {

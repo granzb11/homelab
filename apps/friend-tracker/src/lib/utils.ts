@@ -5,7 +5,9 @@ export function daysSince(date: Date | null | undefined): number | null {
 }
 
 export function formatDate(date: Date | string): string {
-  return new Date(date).toLocaleDateString("en-US", {
+  const iso = typeof date === "string" ? date : date.toISOString();
+  const [y, m, d] = iso.split("T")[0].split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",

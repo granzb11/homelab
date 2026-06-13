@@ -1,10 +1,12 @@
 import Link from "next/link";
 
-interface FriendStatus {
+export interface FriendStatus {
   id: string;
   name: string;
   avatarUrl: string | null;
   daysSpent: number;
+  /** If set, shown instead of the days-spent label */
+  sublabel?: string;
 }
 
 function heatStyle(days: number, max: number): { bg: string; textColor: string } {
@@ -16,38 +18,50 @@ function heatStyle(days: number, max: number): { bg: string; textColor: string }
   return               { bg: "oklch(0.88 0.06 60)",   textColor: "oklch(0.44 0.015 140)" };
 }
 
-export function FriendHeatGrid({ friends }: { friends: FriendStatus[] }) {
+export function FriendHeatGrid({
+  friends,
+  dividerAfter,
+}: {
+  friends: FriendStatus[];
+  dividerAfter?: number;
+}) {
   const max = Math.max(...friends.map((f) => f.daysSpent), 1);
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      {friends.map((f) => {
+    <div className="grid grid-cols-4 gap-3">
+      {friends.map((f, i) => {
         const { bg, textColor } = heatStyle(f.daysSpent, max);
         const initials = f.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
-        const label = f.daysSpent === 0 ? "0 days" : `${f.daysSpent} day${f.daysSpent !== 1 ? "s" : ""}`;
+        const label = f.sublabel ?? (f.daysSpent === 0 ? "0d" : `${f.daysSpent}d`);
+        const isFirstOfSecondGroup = dividerAfter !== undefined && i === dividerAfter;
         return (
-          <Link key={f.id} href={`/friends/${f.id}`}>
-            <div
-              className="rounded-2xl p-5 flex flex-col items-center gap-2 hover:scale-[1.02] cursor-pointer"
-              style={{ backgroundColor: bg, color: textColor }}
-            >
-              {f.avatarUrl ? (
-                <img
-                  src={f.avatarUrl}
-                  alt={f.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-              ) : (
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl font-display"
-                  style={{ backgroundColor: "rgba(255,255,255,0.18)", color: textColor }}
-                >
-                  {initials}
-                </div>
-              )}
-              <p className="font-medium text-sm text-center leading-tight">{f.name}</p>
-              <p className="text-xs" style={{ opacity: 0.75 }}>{label}</p>
-            </div>
-          </Link>
+          <>
+            {isFirstOfSecondGroup && (
+              <div key={`divider-${i}`} className="col-span-4 border-t border-ink-faint -my-1" />
+            )}
+            <Link key={f.id} href={`/friends/${f.id}`}>
+              <div
+                className="rounded-2xl p-3 flex flex-col items-center gap-2 hover:scale-[1.02] cursor-pointer transition-transform"
+                style={{ backgroundColor: bg, color: textColor }}
+              >
+                {f.avatarUrl ? (
+                  <img
+                    src={f.avatarUrl}
+                    alt={f.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-base font-display"
+                    style={{ backgroundColor: "rgba(255,255,255,0.18)", color: textColor }}
+                  >
+                    {initials}
+                  </div>
+                )}
+                <p className="font-medium text-xs text-center leading-tight truncate w-full">{f.name.split(" ")[0]}</p>
+                <p className="text-[10px]" style={{ opacity: 0.75 }}>{label}</p>
+              </div>
+            </Link>
+          </>
         );
       })}
     </div>

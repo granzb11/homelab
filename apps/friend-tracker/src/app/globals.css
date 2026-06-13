@@ -42,6 +42,11 @@ body {
   }
 }
 
+@keyframes tooltip-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 @keyframes pill-pop {
   0%   { transform: scale(1); }
   40%  { transform: scale(1.18); }
@@ -53,6 +58,27 @@ body {
   0%   { transform: scale(1); }
   40%  { transform: scale(0.88); }
   100% { transform: scale(1); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pop-in {
+  0%   { opacity: 0; transform: scale(0.88); }
+  60%  { transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes photo-appear {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: oklch(0.35 0.11 140 / 0.4); }
+  50%       { border-color: oklch(0.35 0.11 140 / 0.9); }
 }
 
 /* Custom focus ring using moss color */

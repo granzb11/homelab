@@ -17,7 +17,7 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
 export async function PATCH(request: NextRequest, ctx: Ctx) {
   const { id } = await ctx.params;
   const body = await request.json();
-  const { startDate, endDate, notes, location, eventType, city, whoTraveled, friendIds, title } = body;
+  const { startDate, endDate, notes, location, eventType, city, whoTraveled, friendIds, title, status } = body;
 
   let lat: number | undefined;
   let lng: number | undefined;
@@ -38,6 +38,7 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
       ...(city !== undefined && { city: city?.trim() || null }),
       ...(whoTraveled !== undefined && { whoTraveled: whoTraveled?.trim() || null }),
       ...(title !== undefined && { title: title?.trim() || null }),
+      ...(status !== undefined && { status: status === "planned" ? "planned" : "logged" }),
       ...(lat !== undefined && { lat }),
       ...(lng !== undefined && { lng }),
       ...(friendIds !== undefined && {

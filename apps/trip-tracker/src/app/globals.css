@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+/* Dark mode is driven by a `.dark` class on <html> (toggled in DarkModeProvider),
+   not the OS media query. Color tokens below are redefined under `.dark` so every
+   `text-ink` / `bg-panel` / `bg-moss` utility adapts automatically. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-moss: oklch(0.35 0.11 140);
+  --color-moss-dark: oklch(0.27 0.09 140);
+  --color-moss-tint: oklch(0.94 0.04 140);
+
+  --color-gold: oklch(0.65 0.15 60);
+  --color-gold-tint: oklch(0.93 0.04 60);
+
+  --color-ink: oklch(0.12 0.015 140);
+  --color-ink-muted: oklch(0.44 0.015 140);
+  --color-ink-faint: oklch(0.88 0.004 140);
+
+  --color-bg: oklch(1 0 0);
+  --color-surface: oklch(1 0 0);
+  --color-panel: oklch(0.975 0.004 140);
+}
+
+@theme inline {
+  --font-display: var(--font-spectral), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+  --font-sans: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+:root {
+  color-scheme: light;
+}
+
+/* Deep moss-charcoal — a near-black warmed with a whisper of moss, never pure black.
+   Surfaces step up in lightness for depth (tonal layering, not shadows). Interactive
+   moss/amber brighten so they still read as accents against the dark ground. */
+.dark {
+  color-scheme: dark;
+
+  --color-moss: oklch(0.66 0.13 148);
+  --color-moss-dark: oklch(0.56 0.12 148);
+  --color-moss-tint: oklch(0.30 0.045 150);
+
+  --color-gold: oklch(0.78 0.13 72);
+  --color-gold-tint: oklch(0.32 0.05 70);
+
+  --color-ink: oklch(0.95 0.012 145);
+  --color-ink-muted: oklch(0.70 0.015 145);
+  --color-ink-faint: oklch(0.34 0.015 150);
+
+  --color-bg: oklch(0.165 0.016 150);
+  --color-surface: oklch(0.21 0.018 150);
+  --color-panel: oklch(0.255 0.02 150);
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a,
+  button,
+  input,
+  select,
+  textarea {
+    transition-property: color, background-color, border-color, opacity, box-shadow;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.25, 0, 0, 1);
+  }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pop-in {
+  0%   { opacity: 0; transform: scale(0.88); }
+  60%  { transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes check-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-moss);
+  outline-offset: 2px;
+}

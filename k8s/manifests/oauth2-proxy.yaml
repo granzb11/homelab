@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: oauth2-proxy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oauth2-proxy
+  namespace: oauth2-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oauth2-proxy
+  template:
+    metadata:
+      labels:
+        app: oauth2-proxy
+    spec:
+      containers:
+      - name: oauth2-proxy
+        image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
+        args:
+        - --provider=keycloak-oidc
+        - --oidc-issuer-url=http://keycloak.keycloak.svc.cluster.local:8080/realms/homelab
+        - --client-id=oauth2-proxy
+        # Tokens are issued with the public URL as issuer — skip issuer verification
+        # so internal discovery URL doesn't have to match the token's iss claim
+        - --insecure-oidc-skip-issuer-verification=true
+        # Keycloak's access tokens have aud=["account"] by default; allow it
+        - --oidc-extra-audience=account
+        - --upstream=static://202
+        - --http-address=0.0.0.0:4180
+        - --reverse-proxy=true
+        - --set-xauthrequest=true
+        - --pass-access-token=true
+        - --email-domain=*
+        - --cookie-domain=.granzb.com
+        - --cookie-secure=true
+        - --cookie-samesite=lax
+        - --cookie-expire=24h
+        - --whitelist-domain=.granzb.com
+        - --skip-provider-button=false
+        env:
+        - name: OAUTH2_PROXY_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: oauth2-proxy-secret
+              key: OAUTH2_PROXY_CLIENT_SECRET
+        - name: OAUTH2_PROXY_COOKIE_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: oauth2-proxy-secret
+              key: OAUTH2_PROXY_COOKIE_SECRET
+        ports:
+        - containerPort: 4180
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: 4180
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oauth2-proxy
+  namespace: oauth2-proxy
+spec:
+  selector:
+    app: oauth2-proxy
+  ports:
+  - port: 4180
+    targetPort: 4180
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: oauth2-proxy
+  namespace: oauth2-proxy
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: oauth2-proxy.granzb.com
+    http:
+      paths:
+      - path: /oauth2
+        pathType: Prefix
+        backend:
+          service:
+            name: oauth2-proxy
+            port:
+              number: 4180

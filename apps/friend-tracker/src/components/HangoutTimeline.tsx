@@ -15,10 +15,15 @@ interface FriendEvent {
   friends: { id: string; name: string }[];
 }
 
+function parseLocalDate(str: string): Date {
+  const [y, m, d] = str.split("T")[0].split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
 function dateRange(start: string, end: string | null): string {
   if (!end) return formatDate(start);
-  const s = new Date(start);
-  const e = new Date(end);
+  const s = parseLocalDate(start);
+  const e = parseLocalDate(end);
   if (s.getMonth() === e.getMonth() && s.getFullYear() === e.getFullYear()) {
     return `${s.toLocaleDateString("en-US", { month: "short", day: "numeric" })}–${e.getDate()}, ${e.getFullYear()}`;
   }

@@ -1,0 +1,187 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Trip {
+  id            String            @id @default(cuid())
+  name          String
+  description   String?
+  destination   String?
+  startDate     DateTime?
+  endDate       DateTime?
+  coverImageUrl String?
+  status        TripStatus        @default(PLANNING)
+  budget        Decimal?          @db.Decimal(10, 2)
+  hangoutEventId String?          // Friend Tracker Event id for the synced hangout
+  createdAt     DateTime          @default(now())
+  reservations  Reservation[]
+  expenses      Expense[]
+  participants  TripParticipant[]
+  todos         BookingTodo[]
+  cities        TripCity[]
+}
+
+enum TripStatus {
+  PLANNING
+  ACTIVE
+  COMPLETED
+}
+
+model TripParticipant {
+  id        String    @id @default(cuid())
+  tripId    String
+  friendId  String
+  joinDate  DateTime?
+  leaveDate DateTime?
+  notes     String?
+  createdAt DateTime  @default(now())
+  trip      Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@unique([tripId, friendId])
+}
+
+model Reservation {
+  id               String                  @id @default(cuid())
+  tripId           String
+  type             ReservationType
+  title            String
+  confirmationCode String?
+  provider         String?
+  startDate        DateTime?
+  startTime        String?
+  endDate          DateTime?
+  endTime          String?
+  startLocation    String?
+  endLocation      String?
+  city             String?
+  state            String?
+  lat              Float?
+  lng              Float?
+  durationMinutes  Int?
+  partySize        Int?
+  price            Decimal?                @db.Decimal(10, 2)
+  currency         String                  @default("USD")
+  notes            String?
+  color            String?
+  splitMode        SplitMode               @default(EVEN)
+  paidBy           String                  @default("__you__")
+  createdAt        DateTime                @default(now())
+  trip             Trip                    @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  participants     ReservationParticipant[]
+  attachments      ReservationAttachment[]
+}
+
+enum ReservationType {
+  FLIGHT
+  HOTEL
+  AIRBNB
+  TRAIN
+  BUS
+  RENTAL_CAR
+  FOOD_TOUR
+  CITY_TOUR
+  MUSEUM
+  RESTAURANT
+  ACTIVITY
+  OTHER
+}
+
+enum SplitMode {
+  EVEN
+  PERCENT
+  AMOUNT
+}
+
+model ReservationParticipant {
+  id            String      @id @default(cuid())
+  reservationId String
+  friendId      String
+  inSplit       Boolean     @default(true)
+  splitValue    Decimal?    @db.Decimal(10, 2)
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+  @@unique([reservationId, friendId])
+}
+
+model ReservationAttachment {
+  id            String      @id @default(cuid())
+  reservationId String
+  filename      String
+  originalName  String
+  mimeType      String
+  createdAt     DateTime    @default(now())
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+}
+
+model Expense {
+  id               String                @id @default(cuid())
+  tripId           String
+  title            String
+  amount           Decimal               @db.Decimal(10, 2)
+  currency         String                @default("USD")
+  date             DateTime?
+  category         String                @default("OTHER")
+  notes            String?
+  splitMode        SplitMode             @default(EVEN)
+  paidBy           String                @default("__you__")
+  createdAt        DateTime              @default(now())
+  trip             Trip                  @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  participants     ExpenseParticipant[]
+}
+
+model ExpenseParticipant {
+  id            String   @id @default(cuid())
+  expenseId     String
+  friendId      String
+  inSplit       Boolean  @default(true)
+  splitValue    Decimal? @db.Decimal(10, 2)
+  expense       Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+
+  @@unique([expenseId, friendId])
+}
+
+model TripCity {
+  id              String    @id @default(cuid())
+  tripId          String
+  name            String
+  targetStartDate DateTime?
+  targetEndDate   DateTime?
+  notes           String?
+  createdAt       DateTime  @default(now())
+  trip            Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
+
+model BookingTodo {
+  id        String    @id @default(cuid())
+  tripId    String
+  label     String
+  notes     String?
+  dueDate   DateTime?
+  bookedAt  DateTime?
+  createdAt DateTime  @default(now())
+  trip      Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
+
+model Restaurant {
+  id          String           @id @default(cuid())
+  name        String
+  cuisine     String?
+  location    String?
+  url         String?
+  status      RestaurantStatus @default(WANT_TO_GO)
+  visitedWith String?
+  notes       String?
+  visitedAt   DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+enum RestaurantStatus {
+  WANT_TO_GO
+  VISITED
+}

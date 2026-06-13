@@ -35,8 +35,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/friends" className="hover:text-ink whitespace-nowrap">Friends</Link>
               <Link href="/hangouts/new" className="hover:text-ink whitespace-nowrap hidden sm:inline">Log hangout</Link>
               <Link href="/reminders" className="hover:text-ink whitespace-nowrap hidden sm:inline">Reminders</Link>
-              <Link href="/map" className="hover:text-ink whitespace-nowrap hidden sm:inline">Map</Link>
-              <Link href="/recap" className="hover:text-ink whitespace-nowrap">Recap</Link>
             </div>
           </div>
         </nav>

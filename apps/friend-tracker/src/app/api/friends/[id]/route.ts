@@ -10,7 +10,7 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
   const friend = await prisma.friend.findUnique({
     where: { id },
     include: {
-      events: { orderBy: { startDate: "desc" } },
+      events: { where: { status: "logged" }, orderBy: { startDate: "desc" } },
       reminders: true,
       relationshipsAs: { include: { friendB: true } },
       relationshipsAs2: { include: { friendA: true } },

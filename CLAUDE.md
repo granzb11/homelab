@@ -59,7 +59,8 @@ Visit `http://hello.home` to confirm the stack is working.
 
 2. **Apply it:**
    ```bash
-   kubectl apply -f k8s/manifests/<app-name>.yaml
+   make deploy-<app-name>
+   # or directly: kubectl apply -f k8s/manifests/<app-name>.yaml
    ```
 
 3. **Add the hostname** (use the same ingress IP — no need to look it up again):
@@ -67,7 +68,22 @@ Visit `http://hello.home` to confirm the stack is working.
    echo "<ingress-IP>  <app>.home" | sudo tee -a /etc/hosts
    ```
 
-4. **Open** `http://<app>.home` in the browser.
+4. **Update the Makefile** by adding targets for the new app in `Makefile`:
+   ```makefile
+   deploy-<app-name>:
+   	kubectl apply -f k8s/manifests/<app-name>.yaml
+   
+   restart-<app-name>:
+   	kubectl rollout restart deployment/<app-name> -n <app-name>
+   
+   logs-<app-name>:
+   	kubectl logs -n <app-name> deploy/<app-name> -f
+   
+   delete-<app-name>:
+   	kubectl delete namespace <app-name>
+   ```
+
+5. **Open** `http://<app>.home` in the browser.
 
 ### Exposing an app publicly via Cloudflare Tunnel (optional)
 
@@ -104,7 +120,29 @@ Cloudflare handles HTTPS automatically — no cert setup needed.
 
 ---
 
-## Useful commands
+## Makefile shortcuts
+
+Use `Makefile` for common operations instead of typing kubectl commands:
+
+```bash
+make help                    # List all targets
+
+# Deploy, restart, and logs
+make deploy-friend-tracker   # Apply a manifest
+make restart-friend-tracker  # Rollout restart after code changes
+make logs-friend-tracker     # Tail pod logs
+
+# Cleanup
+make delete-friend-tracker   # Delete namespace entirely
+
+# Utilities
+make kubectl-status          # Check ingress IP
+make setup                   # Run initial cluster setup
+```
+
+**When adding a new app:** add the four standard targets (`deploy-`, `restart-`, `logs-`, `delete-`) to `Makefile` so future work stays consistent.
+
+## Raw kubectl commands (fallback)
 
 ```bash
 # Current ingress IP
@@ -130,13 +168,31 @@ kubectl delete namespace <app-name>
 ```
 homelab/
 ├── CLAUDE.md              # This file — Claude Code context
+├── Makefile               # Shortcuts for deploy, restart, logs, delete
+├── backlog/               # Planned work — one markdown file per idea
 ├── k8s/
 │   ├── setup.sh           # One-time cluster bootstrap
 │   ├── README.md          # Human-readable setup guide
 │   └── manifests/
-│       └── test-app.yaml  # hello-world smoke test (hello.home)
-└── jira/                  # Unrelated Jira tooling
+│       ├── friend-tracker.yaml
+│       ├── trip-tracker.yaml
+│       └── ...            # One manifest per app
+├── apps/                  # Source code for apps
+│   ├── friend-tracker/
+│   ├── trip-tracker/
+│   └── michelin-tracker/
+└── backlog/               # Unplanned work and ideas
 ```
+
+---
+
+## Backlog
+
+Planned features and projects live in `backlog/` as individual markdown files. Each file describes the idea, architecture, and implementation steps in enough detail to pick up cold.
+
+- Before starting a new project, check `backlog/` for an existing plan.
+- When a plan is agreed on but not yet started, save it to `backlog/<slug>.md`.
+- When work on a backlog item begins, move or delete the file so the backlog stays current.
 
 ---
 

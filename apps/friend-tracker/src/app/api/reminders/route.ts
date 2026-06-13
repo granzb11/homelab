@@ -7,7 +7,7 @@ export async function GET() {
     include: {
       friend: {
         include: {
-          events: { orderBy: { startDate: "desc" }, take: 1 },
+          events: { where: { status: "logged" }, orderBy: { startDate: "desc" }, take: 1 },
         },
       },
     },

@@ -1,0 +1,249 @@
+"use client";
+
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import type { Friend } from "@/lib/friends";
+import ItineraryView from "./ItineraryView";
+import CalendarView from "./CalendarView";
+import ReservationsList from "./ReservationsList";
+import ExpensesList from "./ExpensesList";
+import PeopleList from "./PeopleList";
+import TodoChecklist from "./TodoChecklist";
+import EmailImport from "./EmailImport";
+import FinancialDashboard from "./FinancialDashboard";
+
+type Attachment = { id: string; filename: string; originalName: string; mimeType: string };
+type Participant = { id: string; friendId: string; inSplit: boolean; splitValue: string | null };
+
+type Reservation = {
+  id: string;
+  tripId: string;
+  type: string;
+  title: string;
+  confirmationCode: string | null;
+  provider: string | null;
+  startDate: string | null;
+  startTime: string | null;
+  endDate: string | null;
+  endTime: string | null;
+  startLocation: string | null;
+  endLocation: string | null;
+  city: string | null;
+  state: string | null;
+  durationMinutes: number | null;
+  partySize: number | null;
+  price: string | null;
+  currency: string;
+  notes: string | null;
+  color: string | null;
+  splitMode: string;
+  paidBy: string;
+  createdAt: string;
+  participants: Participant[];
+  attachments: Attachment[];
+};
+
+type Expense = {
+  id: string;
+  tripId: string;
+  title: string;
+  amount: string | null;
+  currency: string;
+  date: string | null;
+  category: string;
+  notes: string | null;
+  splitMode: string;
+  paidBy: string;
+  createdAt: string;
+  participants: Participant[];
+};
+
+type TripParticipant = {
+  id: string;
+  tripId: string;
+  friendId: string;
+  joinDate: string | null;
+  leaveDate: string | null;
+  notes: string | null;
+};
+
+type Todo = {
+  id: string;
+  tripId: string;
+  label: string;
+  notes: string | null;
+  dueDate: string | null;
+  bookedAt: string | null;
+  createdAt: string;
+};
+
+export type TripCity = {
+  id: string;
+  tripId: string;
+  name: string;
+  targetStartDate: string | null;
+  targetEndDate: string | null;
+  notes: string | null;
+  createdAt: string;
+};
+
+type Trip = {
+  id: string;
+  name: string;
+  budget: string | null;
+  reservations: Reservation[];
+  expenses: Expense[];
+  participants: TripParticipant[];
+  todos: Todo[];
+  cities: TripCity[];
+};
+
+const TABS = ["calendar", "expenses", "itinerary", "people", "reservations"] as const;
+type Tab = typeof TABS[number];
+
+const TAB_LABELS: Record<Tab, string> = {
+  itinerary: "Itinerary",
+  calendar: "Calendar",
+  reservations: "Reservations",
+  expenses: "Expenses",
+  people: "People",
+};
+
+export default function TripDetailClient({
+  trip: initialTrip,
+  friendMap,
+}: {
+  trip: Trip;
+  friendMap: Record<string, Friend>;
+}) {
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<Tab>("itinerary");
+  const [trip, setTrip] = useState(initialTrip);
+
+  const refresh = useCallback(() => router.refresh(), [router]);
+  const [addCityTrigger, setAddCityTrigger] = useState(0);
+
+  const pendingTodos = trip.todos.filter((t) => !t.bookedAt).length;
+
+  return (
+    <div className="space-y-6">
+      {/* Todo checklist always visible above tabs */}
+      <TodoChecklist
+        tripId={trip.id}
+        todos={trip.todos}
+        onUpdate={(todos) => setTrip({ ...trip, todos })}
+      />
+
+      {/* Tabs */}
+      <div>
+        <div className="flex items-center justify-between mb-0 gap-4">
+          <div className="flex-1" />
+          {activeTab === "itinerary" && (
+            <button
+              onClick={() => setAddCityTrigger((n) => n + 1)}
+              className="text-xs border border-ink-faint px-3 py-1.5 text-ink-muted hover:border-moss hover:text-moss"
+            >
+              + Add a planned stop
+            </button>
+          )}
+          <EmailImport tripId={trip.id} onImported={refresh} />
+        </div>
+        <div className="flex border-b border-ink-faint gap-0">
+          {TABS.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2.5 text-sm border-b-2 -mb-px ${
+                activeTab === tab
+                  ? "border-moss text-ink font-medium"
+                  : "border-transparent text-ink hover:text-ink"
+              }`}
+            >
+              {TAB_LABELS[tab]}
+              {tab === "reservations" && trip.reservations.length > 0 && (
+                <span className="ml-1.5 text-xs text-ink">{trip.reservations.length}</span>
+              )}
+              {tab === "expenses" && trip.expenses.length > 0 && (
+                <span className="ml-1.5 text-xs text-ink">{trip.expenses.length}</span>
+              )}
+              {tab === "people" && trip.participants.length > 0 && (
+                <span className="ml-1.5 text-xs text-ink">{trip.participants.length}</span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        <div className="pt-6">
+          {activeTab === "itinerary" && (
+            <ItineraryView
+              tripId={trip.id}
+              reservations={trip.reservations}
+              cities={trip.cities}
+              friendMap={friendMap}
+              onCitiesUpdate={(cities) => setTrip({ ...trip, cities })}
+              addTrigger={addCityTrigger}
+            />
+          )}
+          {activeTab === "calendar" && (
+            <CalendarView
+              reservations={trip.reservations}
+              friendMap={friendMap}
+            />
+          )}
+{activeTab === "reservations" && (
+            <ReservationsList
+              tripId={trip.id}
+              reservations={trip.reservations}
+              friendMap={friendMap}
+              onUpdate={(reservations) => { setTrip({ ...trip, reservations }); refresh(); }}
+            />
+          )}
+          {activeTab === "expenses" && (
+            <div className="space-y-8">
+              <div className="flex justify-between items-center">
+                <h2 className="text-lg font-medium text-ink">Expenses & Financials</h2>
+                <button
+                  onClick={() => {
+                    const expensesListElement = document.querySelector('[data-expenses-list]');
+                    if (expensesListElement) {
+                      expensesListElement.dispatchEvent(new CustomEvent('openNewExpense'));
+                    }
+                  }}
+                  className="px-4 py-2 bg-moss text-white text-sm font-medium hover:bg-moss transition-colors"
+                >
+                  Add expense
+                </button>
+              </div>
+
+              <FinancialDashboard
+                trip={trip}
+                friendMap={friendMap}
+                onRefresh={refresh}
+              />
+              <div className="border-t border-ink-faint pt-8" data-expenses-list>
+                <ExpensesList
+                  tripId={trip.id}
+                  expenses={trip.expenses}
+                  friendMap={friendMap}
+                  onUpdate={(expenses) => { setTrip({ ...trip, expenses }); refresh(); }}
+                />
+              </div>
+            </div>
+          )}
+          {activeTab === "people" && (
+            <PeopleList
+              tripId={trip.id}
+              participants={trip.participants}
+              friendMap={friendMap}
+              onUpdate={(participants) => { setTrip({ ...trip, participants }); refresh(); }}
+            />
+          )}
+        </div>
+      </div>
+
+      {pendingTodos === 0 && trip.todos.length > 0 && (
+        <p className="text-xs text-moss text-center py-2">All items booked ✓</p>
+      )}
+    </div>
+  );
+}
