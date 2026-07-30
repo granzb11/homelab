@@ -332,9 +332,9 @@ function RowCard({
         <div className="flex-1 min-w-0">
           <div className="font-sans text-[16.5px] font-bold tracking-tight text-ink truncate">{title}</div>
           {sub && <div className="font-sans text-[13.5px] text-ink-muted mt-0.5 truncate">{sub}</div>}
-          {participants && friendMap && participants.length > 0 && (
+          {participants && friendMap && participants.filter(p => p.friendId !== "__you__").length > 0 && (
             <div className="flex -space-x-2 mt-2">
-              {participants.map((p) => {
+              {participants.filter(p => p.friendId !== "__you__").map((p) => {
                 const friend = friendMap[p.friendId];
                 return (
                   <div
