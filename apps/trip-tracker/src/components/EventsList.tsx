@@ -19,11 +19,13 @@ export default function EventsList({
   events: initialEvents,
   friendMap,
   onUpdate,
+  isReadOnly = false,
 }: {
   tripId: string;
   events: Event[];
   friendMap: Record<string, Friend>;
   onUpdate: (events: Event[]) => void;
+  isReadOnly?: boolean;
 }) {
   const [events, setEvents] = useState(initialEvents);
   const [showForm, setShowForm] = useState(false);
@@ -95,14 +97,16 @@ export default function EventsList({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <button
-          onClick={openAdd}
-          className="bg-moss text-white text-sm px-4 py-2 hover:bg-moss"
-        >
-          + Add event
-        </button>
-      </div>
+      {!isReadOnly && (
+        <div className="flex justify-end">
+          <button
+            onClick={openAdd}
+            className="bg-moss text-white text-sm px-4 py-2 hover:bg-moss"
+          >
+            + Add event
+          </button>
+        </div>
+      )}
 
       {events.length === 0 && !showForm && (
         <div className="border border-dashed border-ink-faint p-10 text-center">
@@ -123,10 +127,12 @@ export default function EventsList({
                     <h3 className="font-medium text-ink">{e.title}</h3>
                     <p className="text-xs text-ink">{e.type.replace(/_/g, " ").toLowerCase()}</p>
                   </div>
-                  <div className="flex gap-2 flex-shrink-0">
-                    <button onClick={() => openEdit(e)} className="text-xs text-ink hover:text-ink">Edit</button>
-                    <button onClick={() => deleteEvent(e.id)} className="text-xs text-ink hover:text-red-500">Delete</button>
-                  </div>
+                  {!isReadOnly && (
+                    <div className="flex gap-2 flex-shrink-0">
+                      <button onClick={() => openEdit(e)} className="text-xs text-ink hover:text-ink">Edit</button>
+                      <button onClick={() => deleteEvent(e.id)} className="text-xs text-ink hover:text-red-500">Delete</button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 mt-2 text-xs text-ink">
@@ -198,26 +204,30 @@ export default function EventsList({
                       >
                         {a.originalName}
                       </a>
-                      <button
-                        onClick={() => deleteAttachment(e.id, a.id)}
-                        className="text-ink hover:text-red-500 flex-shrink-0"
-                      >
-                        ✕
-                      </button>
+                      {!isReadOnly && (
+                        <button
+                          onClick={() => deleteAttachment(e.id, a.id)}
+                          className="text-ink hover:text-red-500 flex-shrink-0"
+                        >
+                          ✕
+                        </button>
+                      )}
                     </div>
                   ))}
-                  <label className="cursor-pointer text-xs text-ink hover:text-ink flex items-center gap-1">
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={(ev) => {
-                        const f = ev.target.files?.[0];
-                        if (f) uploadFile(e.id, f);
-                        ev.target.value = "";
-                      }}
-                    />
-                    {uploadingFor === e.id ? "Uploading…" : "+ Attach file"}
-                  </label>
+                  {!isReadOnly && (
+                    <label className="cursor-pointer text-xs text-ink hover:text-ink flex items-center gap-1">
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={(ev) => {
+                          const f = ev.target.files?.[0];
+                          if (f) uploadFile(e.id, f);
+                          ev.target.value = "";
+                        }}
+                      />
+                      {uploadingFor === e.id ? "Uploading…" : "+ Attach file"}
+                    </label>
+                  )}
                 </div>
               </div>
             </div>

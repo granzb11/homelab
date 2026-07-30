@@ -1203,6 +1203,7 @@ export const TripScalarFieldEnum = {
   status: 'status',
   budget: 'budget',
   hangoutEventId: 'hangoutEventId',
+  shareToken: 'shareToken',
   createdAt: 'createdAt'
 } as const
 

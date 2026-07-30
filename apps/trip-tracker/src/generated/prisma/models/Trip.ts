@@ -45,6 +45,7 @@ export type TripMinAggregateOutputType = {
   status: $Enums.TripStatus | null
   budget: runtime.Decimal | null
   hangoutEventId: string | null
+  shareToken: string | null
   createdAt: Date | null
 }
 
@@ -59,6 +60,7 @@ export type TripMaxAggregateOutputType = {
   status: $Enums.TripStatus | null
   budget: runtime.Decimal | null
   hangoutEventId: string | null
+  shareToken: string | null
   createdAt: Date | null
 }
 
@@ -73,6 +75,7 @@ export type TripCountAggregateOutputType = {
   status: number
   budget: number
   hangoutEventId: number
+  shareToken: number
   createdAt: number
   _all: number
 }
@@ -97,6 +100,7 @@ export type TripMinAggregateInputType = {
   status?: true
   budget?: true
   hangoutEventId?: true
+  shareToken?: true
   createdAt?: true
 }
 
@@ -111,6 +115,7 @@ export type TripMaxAggregateInputType = {
   status?: true
   budget?: true
   hangoutEventId?: true
+  shareToken?: true
   createdAt?: true
 }
 
@@ -125,6 +130,7 @@ export type TripCountAggregateInputType = {
   status?: true
   budget?: true
   hangoutEventId?: true
+  shareToken?: true
   createdAt?: true
   _all?: true
 }
@@ -226,6 +232,7 @@ export type TripGroupByOutputType = {
   status: $Enums.TripStatus
   budget: runtime.Decimal | null
   hangoutEventId: string | null
+  shareToken: string | null
   createdAt: Date
   _count: TripCountAggregateOutputType | null
   _avg: TripAvgAggregateOutputType | null
@@ -263,6 +270,7 @@ export type TripWhereInput = {
   status?: Prisma.EnumTripStatusFilter<"Trip"> | $Enums.TripStatus
   budget?: Prisma.DecimalNullableFilter<"Trip"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.StringNullableFilter<"Trip"> | string | null
+  shareToken?: Prisma.StringNullableFilter<"Trip"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
   events?: Prisma.EventListRelationFilter
   expenses?: Prisma.ExpenseListRelationFilter
@@ -283,6 +291,7 @@ export type TripOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   budget?: Prisma.SortOrderInput | Prisma.SortOrder
   hangoutEventId?: Prisma.SortOrderInput | Prisma.SortOrder
+  shareToken?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   events?: Prisma.EventOrderByRelationAggregateInput
   expenses?: Prisma.ExpenseOrderByRelationAggregateInput
@@ -294,6 +303,7 @@ export type TripOrderByWithRelationInput = {
 
 export type TripWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  shareToken?: string
   AND?: Prisma.TripWhereInput | Prisma.TripWhereInput[]
   OR?: Prisma.TripWhereInput[]
   NOT?: Prisma.TripWhereInput | Prisma.TripWhereInput[]
@@ -313,7 +323,7 @@ export type TripWhereUniqueInput = Prisma.AtLeast<{
   todos?: Prisma.BookingTodoListRelationFilter
   cities?: Prisma.TripCityListRelationFilter
   restaurants?: Prisma.RestaurantListRelationFilter
-}, "id">
+}, "id" | "shareToken">
 
 export type TripOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -326,6 +336,7 @@ export type TripOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   budget?: Prisma.SortOrderInput | Prisma.SortOrder
   hangoutEventId?: Prisma.SortOrderInput | Prisma.SortOrder
+  shareToken?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.TripCountOrderByAggregateInput
   _avg?: Prisma.TripAvgOrderByAggregateInput
@@ -348,6 +359,7 @@ export type TripScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumTripStatusWithAggregatesFilter<"Trip"> | $Enums.TripStatus
   budget?: Prisma.DecimalNullableWithAggregatesFilter<"Trip"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.StringNullableWithAggregatesFilter<"Trip"> | string | null
+  shareToken?: Prisma.StringNullableWithAggregatesFilter<"Trip"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Trip"> | Date | string
 }
 
@@ -362,6 +374,7 @@ export type TripCreateInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
   events?: Prisma.EventCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTripInput
@@ -382,6 +395,7 @@ export type TripUncheckedCreateInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
   events?: Prisma.EventUncheckedCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTripInput
@@ -402,6 +416,7 @@ export type TripUpdateInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.EventUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTripNestedInput
@@ -422,6 +437,7 @@ export type TripUncheckedUpdateInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.EventUncheckedUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTripNestedInput
@@ -442,6 +458,7 @@ export type TripCreateManyInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
 }
 
@@ -456,6 +473,7 @@ export type TripUpdateManyMutationInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -470,6 +488,7 @@ export type TripUncheckedUpdateManyInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -484,6 +503,7 @@ export type TripCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   budget?: Prisma.SortOrder
   hangoutEventId?: Prisma.SortOrder
+  shareToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -502,6 +522,7 @@ export type TripMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   budget?: Prisma.SortOrder
   hangoutEventId?: Prisma.SortOrder
+  shareToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -516,6 +537,7 @@ export type TripMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   budget?: Prisma.SortOrder
   hangoutEventId?: Prisma.SortOrder
+  shareToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -651,6 +673,7 @@ export type TripCreateWithoutParticipantsInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
   events?: Prisma.EventCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTripInput
@@ -670,6 +693,7 @@ export type TripUncheckedCreateWithoutParticipantsInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
   events?: Prisma.EventUncheckedCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTripInput
@@ -705,6 +729,7 @@ export type TripUpdateWithoutParticipantsInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.EventUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTripNestedInput
@@ -724,6 +749,7 @@ export type TripUncheckedUpdateWithoutParticipantsInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.EventUncheckedUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTripNestedInput
@@ -743,6 +769,7 @@ export type TripCreateWithoutEventsInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTripInput
   participants?: Prisma.TripParticipantCreateNestedManyWithoutTripInput
@@ -762,6 +789,7 @@ export type TripUncheckedCreateWithoutEventsInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTripInput
   participants?: Prisma.TripParticipantUncheckedCreateNestedManyWithoutTripInput
@@ -797,6 +825,7 @@ export type TripUpdateWithoutEventsInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expenses?: Prisma.ExpenseUpdateManyWithoutTripNestedInput
   participants?: Prisma.TripParticipantUpdateManyWithoutTripNestedInput
@@ -816,6 +845,7 @@ export type TripUncheckedUpdateWithoutEventsInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTripNestedInput
   participants?: Prisma.TripParticipantUncheckedUpdateManyWithoutTripNestedInput
@@ -835,6 +865,7 @@ export type TripCreateWithoutExpensesInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
   events?: Prisma.EventCreateNestedManyWithoutTripInput
   participants?: Prisma.TripParticipantCreateNestedManyWithoutTripInput
@@ -854,6 +885,7 @@ export type TripUncheckedCreateWithoutExpensesInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
   events?: Prisma.EventUncheckedCreateNestedManyWithoutTripInput
   participants?: Prisma.TripParticipantUncheckedCreateNestedManyWithoutTripInput
@@ -889,6 +921,7 @@ export type TripUpdateWithoutExpensesInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.EventUpdateManyWithoutTripNestedInput
   participants?: Prisma.TripParticipantUpdateManyWithoutTripNestedInput
@@ -908,6 +941,7 @@ export type TripUncheckedUpdateWithoutExpensesInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.EventUncheckedUpdateManyWithoutTripNestedInput
   participants?: Prisma.TripParticipantUncheckedUpdateManyWithoutTripNestedInput
@@ -927,6 +961,7 @@ export type TripCreateWithoutCitiesInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
   events?: Prisma.EventCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTripInput
@@ -946,6 +981,7 @@ export type TripUncheckedCreateWithoutCitiesInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
   events?: Prisma.EventUncheckedCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTripInput
@@ -981,6 +1017,7 @@ export type TripUpdateWithoutCitiesInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.EventUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTripNestedInput
@@ -1000,6 +1037,7 @@ export type TripUncheckedUpdateWithoutCitiesInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.EventUncheckedUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTripNestedInput
@@ -1019,6 +1057,7 @@ export type TripCreateWithoutTodosInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
   events?: Prisma.EventCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTripInput
@@ -1038,6 +1077,7 @@ export type TripUncheckedCreateWithoutTodosInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
   events?: Prisma.EventUncheckedCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTripInput
@@ -1073,6 +1113,7 @@ export type TripUpdateWithoutTodosInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.EventUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTripNestedInput
@@ -1092,6 +1133,7 @@ export type TripUncheckedUpdateWithoutTodosInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.EventUncheckedUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTripNestedInput
@@ -1111,6 +1153,7 @@ export type TripCreateWithoutRestaurantsInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
   events?: Prisma.EventCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTripInput
@@ -1130,6 +1173,7 @@ export type TripUncheckedCreateWithoutRestaurantsInput = {
   status?: $Enums.TripStatus
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
+  shareToken?: string | null
   createdAt?: Date | string
   events?: Prisma.EventUncheckedCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTripInput
@@ -1165,6 +1209,7 @@ export type TripUpdateWithoutRestaurantsInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.EventUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTripNestedInput
@@ -1184,6 +1229,7 @@ export type TripUncheckedUpdateWithoutRestaurantsInput = {
   status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.EventUncheckedUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTripNestedInput
@@ -1279,6 +1325,7 @@ export type TripSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   status?: boolean
   budget?: boolean
   hangoutEventId?: boolean
+  shareToken?: boolean
   createdAt?: boolean
   events?: boolean | Prisma.Trip$eventsArgs<ExtArgs>
   expenses?: boolean | Prisma.Trip$expensesArgs<ExtArgs>
@@ -1300,6 +1347,7 @@ export type TripSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   status?: boolean
   budget?: boolean
   hangoutEventId?: boolean
+  shareToken?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["trip"]>
 
@@ -1314,6 +1362,7 @@ export type TripSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   status?: boolean
   budget?: boolean
   hangoutEventId?: boolean
+  shareToken?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["trip"]>
 
@@ -1328,10 +1377,11 @@ export type TripSelectScalar = {
   status?: boolean
   budget?: boolean
   hangoutEventId?: boolean
+  shareToken?: boolean
   createdAt?: boolean
 }
 
-export type TripOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "destination" | "startDate" | "endDate" | "coverImageUrl" | "status" | "budget" | "hangoutEventId" | "createdAt", ExtArgs["result"]["trip"]>
+export type TripOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "destination" | "startDate" | "endDate" | "coverImageUrl" | "status" | "budget" | "hangoutEventId" | "shareToken" | "createdAt", ExtArgs["result"]["trip"]>
 export type TripInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   events?: boolean | Prisma.Trip$eventsArgs<ExtArgs>
   expenses?: boolean | Prisma.Trip$expensesArgs<ExtArgs>
@@ -1365,6 +1415,7 @@ export type $TripPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     status: $Enums.TripStatus
     budget: runtime.Decimal | null
     hangoutEventId: string | null
+    shareToken: string | null
     createdAt: Date
   }, ExtArgs["result"]["trip"]>
   composites: {}
@@ -1805,6 +1856,7 @@ export interface TripFieldRefs {
   readonly status: Prisma.FieldRef<"Trip", 'TripStatus'>
   readonly budget: Prisma.FieldRef<"Trip", 'Decimal'>
   readonly hangoutEventId: Prisma.FieldRef<"Trip", 'String'>
+  readonly shareToken: Prisma.FieldRef<"Trip", 'String'>
   readonly createdAt: Prisma.FieldRef<"Trip", 'DateTime'>
 }
     

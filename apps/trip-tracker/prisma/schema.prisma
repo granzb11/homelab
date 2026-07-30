@@ -18,6 +18,7 @@ model Trip {
   status        TripStatus        @default(PLANNING)
   budget        Decimal?          @db.Decimal(10, 2)
   hangoutEventId String?          // Friend Tracker Event id for the synced hangout
+  shareToken    String?           @unique
   createdAt     DateTime          @default(now())
   events        Event[]
   expenses      Expense[]

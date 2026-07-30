@@ -38,11 +38,13 @@ export default function ExpensesList({
   expenses,
   friendMap,
   onUpdate,
+  isReadOnly = false,
 }: {
   tripId: string;
   expenses: Expense[];
   friendMap: Record<string, Friend>;
   onUpdate: (expenses: Expense[]) => void;
+  isReadOnly?: boolean;
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Expense | null>(null);
@@ -303,20 +305,22 @@ export default function ExpensesList({
                 </div>
               )}
 
-              <div className="flex gap-2">
-                <button
-                  onClick={() => openEdit(expense)}
-                  className="text-xs text-moss hover:underline"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => deleteExpense(expense.id)}
-                  className="text-xs text-gold hover:underline"
-                >
-                  Delete
-                </button>
-              </div>
+              {!isReadOnly && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => openEdit(expense)}
+                    className="text-xs text-moss hover:underline"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => deleteExpense(expense.id)}
+                    className="text-xs text-gold hover:underline"
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>

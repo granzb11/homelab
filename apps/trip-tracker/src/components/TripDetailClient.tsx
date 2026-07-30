@@ -118,9 +118,11 @@ const TAB_LABELS: Record<Tab, string> = {
 export default function TripDetailClient({
   trip: initialTrip,
   friendMap,
+  isSharedView = false,
 }: {
   trip: Trip;
   friendMap: Record<string, Friend>;
+  isSharedView?: boolean;
 }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>("itinerary");
@@ -143,40 +145,45 @@ export default function TripDetailClient({
   return (
     <div className="space-y-6">
       {/* Todo checklist always visible above tabs */}
-      <TodoChecklist
-        tripId={trip.id}
-        todos={trip.todos}
-        onUpdate={(todos) => setTrip({ ...trip, todos })}
-      />
+      {!isSharedView && (
+        <TodoChecklist
+          tripId={trip.id}
+          todos={trip.todos}
+          onUpdate={(todos) => setTrip({ ...trip, todos })}
+        />
+      )}
 
       {/* Tabs */}
       <div>
         <div className="flex border-b border-ink-faint gap-0">
-          {TABS.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2.5 text-sm border-b-2 -mb-px ${
-                activeTab === tab
-                  ? "border-moss text-ink font-medium"
-                  : "border-transparent text-ink hover:text-ink"
-              }`}
-            >
-              {TAB_LABELS[tab]}
-              {tab === "events" && trip.events.length > 0 && (
-                <span className="ml-1.5 text-xs text-ink">{trip.events.length}</span>
-              )}
-              {tab === "expenses" && trip.expenses.length > 0 && (
-                <span className="ml-1.5 text-xs text-ink">{trip.expenses.length}</span>
-              )}
-              {tab === "people" && trip.participants.length > 0 && (
-                <span className="ml-1.5 text-xs text-ink">{trip.participants.length}</span>
-              )}
-              {tab === "restaurants" && trip.restaurants.length > 0 && (
-                <span className="ml-1.5 text-xs text-ink">{trip.restaurants.length}</span>
-              )}
-            </button>
-          ))}
+          {TABS.map((tab) => {
+            if (isSharedView && ["people", "restaurants"].includes(tab)) return null;
+            return (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2.5 text-sm border-b-2 -mb-px ${
+                  activeTab === tab
+                    ? "border-moss text-ink font-medium"
+                    : "border-transparent text-ink hover:text-ink"
+                }`}
+              >
+                {TAB_LABELS[tab]}
+                {tab === "events" && trip.events.length > 0 && (
+                  <span className="ml-1.5 text-xs text-ink">{trip.events.length}</span>
+                )}
+                {tab === "expenses" && trip.expenses.length > 0 && (
+                  <span className="ml-1.5 text-xs text-ink">{trip.expenses.length}</span>
+                )}
+                {tab === "people" && trip.participants.length > 0 && (
+                  <span className="ml-1.5 text-xs text-ink">{trip.participants.length}</span>
+                )}
+                {tab === "restaurants" && trip.restaurants.length > 0 && (
+                  <span className="ml-1.5 text-xs text-ink">{trip.restaurants.length}</span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         <div className="pt-6">
@@ -202,23 +209,26 @@ export default function TripDetailClient({
               events={trip.events}
               friendMap={friendMap}
               onUpdate={(events) => { setTrip({ ...trip, events }); refresh(); }}
+              isReadOnly={isSharedView}
             />
           )}
           {activeTab === "expenses" && (
             <div className="space-y-8">
               <div className="flex justify-between items-center">
                 <h2 className="text-lg font-medium text-ink">Expenses & Financials</h2>
-                <button
-                  onClick={() => {
-                    const expensesListElement = document.querySelector('[data-expenses-list]');
-                    if (expensesListElement) {
-                      expensesListElement.dispatchEvent(new CustomEvent('openNewExpense'));
-                    }
-                  }}
-                  className="px-4 py-2 bg-moss text-white text-sm font-medium hover:bg-moss transition-colors"
-                >
-                  Add expense
-                </button>
+                {!isSharedView && (
+                  <button
+                    onClick={() => {
+                      const expensesListElement = document.querySelector('[data-expenses-list]');
+                      if (expensesListElement) {
+                        expensesListElement.dispatchEvent(new CustomEvent('openNewExpense'));
+                      }
+                    }}
+                    className="px-4 py-2 bg-moss text-white text-sm font-medium hover:bg-moss transition-colors"
+                  >
+                    Add expense
+                  </button>
+                )}
               </div>
 
               <FinancialDashboard
@@ -232,6 +242,7 @@ export default function TripDetailClient({
                   expenses={trip.expenses}
                   friendMap={friendMap}
                   onUpdate={(expenses) => { setTrip({ ...trip, expenses }); refresh(); }}
+                  isReadOnly={isSharedView}
                 />
               </div>
             </div>

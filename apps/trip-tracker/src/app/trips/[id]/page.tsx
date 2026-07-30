@@ -6,6 +6,7 @@ import { fetchFriendMap } from "@/lib/friends";
 import { formatDateRange, tripDurationDays } from "@/lib/utils";
 import TripDetailClient from "@/components/TripDetailClient";
 import DeleteTripButton from "@/components/DeleteTripButton";
+import ShareTripButton from "@/components/ShareTripButton";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -35,6 +36,9 @@ export default async function TripDetailPage({ params }: Ctx) {
   const friendMap = await fetchFriendMap();
   const duration = tripDurationDays(trip.startDate, trip.endDate);
 
+  // Add synthetic entry for "__you__" (trip owner) so avatars display for owner's events
+  friendMap.set("__you__", { id: "__you__", name: "You", avatarUrl: null });
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -57,7 +61,10 @@ export default async function TripDetailPage({ params }: Ctx) {
           </p>
           {trip.description && <p className="text-sm text-ink-muted mt-2 max-w-xl">{trip.description}</p>}
         </div>
-        <DeleteTripButton tripId={trip.id} />
+        <div className="flex gap-2">
+          <ShareTripButton tripId={trip.id} />
+          <DeleteTripButton tripId={trip.id} />
+        </div>
       </div>
 
       <TripDetailClient
