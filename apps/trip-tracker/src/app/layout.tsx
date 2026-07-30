@@ -30,11 +30,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <DarkModeProvider>
           <nav className="bg-surface border-b border-ink-faint sticky top-0 z-10">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
-              <Link href="/" className="font-display italic text-lg font-semibold text-ink hover:text-moss flex-shrink-0">
+              <Link href="/" className="font-display text-lg font-semibold text-ink hover:text-moss flex-shrink-0">
                 Trip Tracker
               </Link>
               <div className="flex items-center gap-4 sm:gap-6 text-sm text-ink-muted min-w-0">
-                <Link href="/restaurants" className="hover:text-ink whitespace-nowrap">Restaurants</Link>
                 <Link href="/trips/new" className="hover:text-ink whitespace-nowrap">New trip</Link>
               </div>
             </div>

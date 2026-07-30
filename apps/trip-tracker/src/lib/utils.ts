@@ -36,12 +36,12 @@ export function tripDurationDays(start?: Date | string | null, end?: Date | stri
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
-type ReservationData = { type: string; price: string | number | null };
+type EventData = { type: string; price: string | number | null };
 
-export function aggregateCosts(reservations: ReservationData[]) {
+export function aggregateCosts(events: EventData[]) {
   const costs: { [key: string]: number } = {};
 
-  reservations.forEach((r) => {
+  events.forEach((r) => {
     if (r.price === null || r.price === undefined) return;
     const price = typeof r.price === "object" ? parseFloat(String(r.price)) : Number(r.price);
     if (isNaN(price)) return;
@@ -60,12 +60,12 @@ export type DetailedItem = {
 };
 
 export function calculateDailySpending(
-  reservations: (ReservationData & { startDate?: Date | string | null })[],
+  events: (EventData & { startDate?: Date | string | null })[],
   tripStartDate?: Date | string | null
 ) {
   const dailySpending: { [dateKey: string]: number } = {};
 
-  reservations.forEach((r) => {
+  events.forEach((r) => {
     if (!r.startDate) return;
     const date = new Date(r.startDate);
     if (!r.price) return;
@@ -79,18 +79,18 @@ export function calculateDailySpending(
 }
 
 export function getDetailedCostsByCategory(
-  reservations: (ReservationData & { id: string; title?: string; startDate?: Date | string | null })[]
+  events: (EventData & { id: string; title?: string; startDate?: Date | string | null })[]
 ): { [category: string]: DetailedItem[] } {
   const categorizedItems: { [category: string]: DetailedItem[] } = {};
 
-  reservations.forEach((r) => {
+  events.forEach((r) => {
     if (r.price === null || r.price === undefined) return;
     const price = typeof r.price === "object" ? parseFloat(String(r.price)) : Number(r.price);
     if (isNaN(price)) return;
     if (!categorizedItems[r.type]) categorizedItems[r.type] = [];
     categorizedItems[r.type].push({
       id: r.id,
-      name: (r as any).title || "Unnamed Reservation",
+      name: (r as any).title || "Unnamed Event",
       type: r.type,
       price,
       date: r.startDate ? new Date(r.startDate).toISOString().split("T")[0] : "—",
@@ -106,11 +106,11 @@ export function getDetailedCostsByCategory(
 }
 
 export function getDetailedDailySpending(
-  reservations: (ReservationData & { id: string; title?: string; startDate?: Date | string | null })[]
+  events: (EventData & { id: string; title?: string; startDate?: Date | string | null })[]
 ): { [dateKey: string]: DetailedItem[] } {
   const dailyItems: { [dateKey: string]: DetailedItem[] } = {};
 
-  reservations.forEach((r) => {
+  events.forEach((r) => {
     if (!r.startDate || r.price === null || r.price === undefined) return;
     const price = typeof r.price === "object" ? parseFloat(String(r.price)) : Number(r.price);
     if (isNaN(price)) return;
@@ -118,7 +118,7 @@ export function getDetailedDailySpending(
     if (!dailyItems[key]) dailyItems[key] = [];
     dailyItems[key].push({
       id: r.id,
-      name: (r as any).title || "Unnamed Reservation",
+      name: (r as any).title || "Unnamed Event",
       type: r.type,
       price,
       date: key,
@@ -138,10 +138,10 @@ export function calculatePerPersonCost(totalCost: number, participantCount: numb
   return totalCost / participantCount;
 }
 
-export function calculateTotalCost(reservations: ReservationData[]): number {
+export function calculateTotalCost(events: EventData[]): number {
   let total = 0;
 
-  reservations.forEach((r) => {
+  events.forEach((r) => {
     if (r.price === null || r.price === undefined) return;
     const price = typeof r.price === "object" ? parseFloat(String(r.price)) : Number(r.price);
     if (!isNaN(price)) total += price;

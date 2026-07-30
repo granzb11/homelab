@@ -10,7 +10,7 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
   const trip = await prisma.trip.findUnique({
     where: { id },
     include: {
-      reservations: {
+      events: {
         include: { participants: true, attachments: true },
         orderBy: { startDate: "asc" },
       },

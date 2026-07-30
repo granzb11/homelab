@@ -5,17 +5,17 @@ import { useRouter } from "next/navigation";
 import type { Friend } from "@/lib/friends";
 import ItineraryView from "./ItineraryView";
 import CalendarView from "./CalendarView";
-import ReservationsList from "./ReservationsList";
+import EventsList from "./EventsList";
 import ExpensesList from "./ExpensesList";
 import PeopleList from "./PeopleList";
 import TodoChecklist from "./TodoChecklist";
-import EmailImport from "./EmailImport";
 import FinancialDashboard from "./FinancialDashboard";
+import RestaurantsClient, { type Restaurant } from "./RestaurantsClient";
 
 type Attachment = { id: string; filename: string; originalName: string; mimeType: string };
 type Participant = { id: string; friendId: string; inSplit: boolean; splitValue: string | null };
 
-type Reservation = {
+type Event = {
   id: string;
   tripId: string;
   type: string;
@@ -30,12 +30,16 @@ type Reservation = {
   endLocation: string | null;
   city: string | null;
   state: string | null;
+  lat: number | null;
+  lng: number | null;
   durationMinutes: number | null;
   partySize: number | null;
   price: string | null;
   currency: string;
   notes: string | null;
-  color: string | null;
+  url: string | null;
+  photoUrl: string | null;
+  previewTitle: string | null;
   splitMode: string;
   paidBy: string;
   createdAt: string;
@@ -91,22 +95,24 @@ type Trip = {
   id: string;
   name: string;
   budget: string | null;
-  reservations: Reservation[];
+  events: Event[];
   expenses: Expense[];
   participants: TripParticipant[];
   todos: Todo[];
   cities: TripCity[];
+  restaurants: Restaurant[];
 };
 
-const TABS = ["calendar", "expenses", "itinerary", "people", "reservations"] as const;
+const TABS = ["calendar", "expenses", "itinerary", "people", "events", "restaurants"] as const;
 type Tab = typeof TABS[number];
 
 const TAB_LABELS: Record<Tab, string> = {
   itinerary: "Itinerary",
   calendar: "Calendar",
-  reservations: "Reservations",
+  events: "Events",
   expenses: "Expenses",
   people: "People",
+  restaurants: "Restaurants",
 };
 
 export default function TripDetailClient({
@@ -121,7 +127,16 @@ export default function TripDetailClient({
   const [trip, setTrip] = useState(initialTrip);
 
   const refresh = useCallback(() => router.refresh(), [router]);
-  const [addCityTrigger, setAddCityTrigger] = useState(0);
+
+  function saveEvent(event: Event) {
+    const exists = trip.events.some((e) => e.id === event.id);
+    const next = (exists
+      ? trip.events.map((e) => (e.id === event.id ? event : e))
+      : [...trip.events, event]
+    ).sort((a, b) => (a.startDate ?? "").localeCompare(b.startDate ?? ""));
+    setTrip({ ...trip, events: next });
+    refresh();
+  }
 
   const pendingTodos = trip.todos.filter((t) => !t.bookedAt).length;
 
@@ -136,18 +151,6 @@ export default function TripDetailClient({
 
       {/* Tabs */}
       <div>
-        <div className="flex items-center justify-between mb-0 gap-4">
-          <div className="flex-1" />
-          {activeTab === "itinerary" && (
-            <button
-              onClick={() => setAddCityTrigger((n) => n + 1)}
-              className="text-xs border border-ink-faint px-3 py-1.5 text-ink-muted hover:border-moss hover:text-moss"
-            >
-              + Add a planned stop
-            </button>
-          )}
-          <EmailImport tripId={trip.id} onImported={refresh} />
-        </div>
         <div className="flex border-b border-ink-faint gap-0">
           {TABS.map((tab) => (
             <button
@@ -160,14 +163,17 @@ export default function TripDetailClient({
               }`}
             >
               {TAB_LABELS[tab]}
-              {tab === "reservations" && trip.reservations.length > 0 && (
-                <span className="ml-1.5 text-xs text-ink">{trip.reservations.length}</span>
+              {tab === "events" && trip.events.length > 0 && (
+                <span className="ml-1.5 text-xs text-ink">{trip.events.length}</span>
               )}
               {tab === "expenses" && trip.expenses.length > 0 && (
                 <span className="ml-1.5 text-xs text-ink">{trip.expenses.length}</span>
               )}
               {tab === "people" && trip.participants.length > 0 && (
                 <span className="ml-1.5 text-xs text-ink">{trip.participants.length}</span>
+              )}
+              {tab === "restaurants" && trip.restaurants.length > 0 && (
+                <span className="ml-1.5 text-xs text-ink">{trip.restaurants.length}</span>
               )}
             </button>
           ))}
@@ -177,25 +183,25 @@ export default function TripDetailClient({
           {activeTab === "itinerary" && (
             <ItineraryView
               tripId={trip.id}
-              reservations={trip.reservations}
+              events={trip.events}
               cities={trip.cities}
               friendMap={friendMap}
               onCitiesUpdate={(cities) => setTrip({ ...trip, cities })}
-              addTrigger={addCityTrigger}
+              onEventSaved={saveEvent}
             />
           )}
           {activeTab === "calendar" && (
             <CalendarView
-              reservations={trip.reservations}
+              events={trip.events}
               friendMap={friendMap}
             />
           )}
-{activeTab === "reservations" && (
-            <ReservationsList
+          {activeTab === "events" && (
+            <EventsList
               tripId={trip.id}
-              reservations={trip.reservations}
+              events={trip.events}
               friendMap={friendMap}
-              onUpdate={(reservations) => { setTrip({ ...trip, reservations }); refresh(); }}
+              onUpdate={(events) => { setTrip({ ...trip, events }); refresh(); }}
             />
           )}
           {activeTab === "expenses" && (
@@ -236,6 +242,12 @@ export default function TripDetailClient({
               participants={trip.participants}
               friendMap={friendMap}
               onUpdate={(participants) => { setTrip({ ...trip, participants }); refresh(); }}
+            />
+          )}
+          {activeTab === "restaurants" && (
+            <RestaurantsClient
+              tripId={trip.id}
+              initialRestaurants={trip.restaurants}
             />
           )}
         </div>

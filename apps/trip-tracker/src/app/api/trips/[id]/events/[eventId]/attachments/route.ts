@@ -8,10 +8,10 @@ import { Readable } from "stream";
 
 const UPLOAD_DIR = "/data/uploads";
 
-type Ctx = { params: Promise<{ id: string; reservationId: string }> };
+type Ctx = { params: Promise<{ id: string; eventId: string }> };
 
 export async function POST(req: NextRequest, ctx: Ctx) {
-  const { reservationId } = await ctx.params;
+  const { eventId } = await ctx.params;
 
   try {
     mkdirSync(UPLOAD_DIR, { recursive: true });
@@ -39,8 +39,8 @@ export async function POST(req: NextRequest, ctx: Ctx) {
         resolve(NextResponse.json({ error: "no file" }, { status: 400 }));
         return;
       }
-      const attachment = await prisma.reservationAttachment.create({
-        data: { reservationId, filename, originalName, mimeType },
+      const attachment = await prisma.eventAttachment.create({
+        data: { eventId, filename, originalName, mimeType },
       });
       resolve(NextResponse.json(attachment, { status: 201 }));
     });
@@ -57,8 +57,8 @@ export async function POST(req: NextRequest, ctx: Ctx) {
 }
 
 export async function DELETE(req: NextRequest, ctx: Ctx) {
-  const { reservationId } = await ctx.params;
+  const { eventId } = await ctx.params;
   const { attachmentId } = await req.json();
-  await prisma.reservationAttachment.deleteMany({ where: { id: attachmentId, reservationId } });
+  await prisma.eventAttachment.deleteMany({ where: { id: attachmentId, eventId } });
   return new NextResponse(null, { status: 204 });
 }

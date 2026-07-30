@@ -1,74 +1,26 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { formatDate, formatPrice } from "@/lib/utils";
+import { useState } from "react";
 import type { Friend } from "@/lib/friends";
-import { AvatarStack } from "@/components/AvatarStack";
-import { BOOKING_COLORS } from "@/components/ReservationsList";
+import EventFormModal from "@/components/EventFormModal";
+import { EVENT_ICONS, type Event, type EventFormShape } from "@/components/eventFormShared";
+import { IconTile, type ItineraryAccent } from "@/components/IconTile";
+import { RouteStrip } from "@/components/RouteStrip";
 import type { TripCity } from "@/components/TripDetailClient";
 
-type Participant = { friendId: string };
-type Attachment = { id: string; filename: string; originalName: string };
-
-type Reservation = {
-  id: string;
-  type: string;
-  title: string;
-  startDate: string | null;
-  startTime: string | null;
-  endDate: string | null;
-  endTime: string | null;
-  startLocation: string | null;
-  endLocation: string | null;
-  city: string | null;
-  state: string | null;
-  durationMinutes: number | null;
-  partySize: number | null;
-  provider: string | null;
-  confirmationCode: string | null;
-  price: string | null;
-  currency: string;
-  notes: string | null;
-  color: string | null;
-  participants: Participant[];
-  attachments: Attachment[];
-};
-
-const ICONS: Record<string, string> = {
-  FLIGHT: "✈", HOTEL: "🏨", AIRBNB: "🏠", TRAIN: "🚂", BUS: "🚌", RENTAL_CAR: "🚗",
-  FOOD_TOUR: "🍜", CITY_TOUR: "🗺", MUSEUM: "🏛", RESTAURANT: "🍽", ACTIVITY: "🎯", OTHER: "📋",
-};
-
-// Opacity-based hue tints so each type's color reads on both the light surface
-// and the dark moss-charcoal ground without needing separate dark: variants.
-const COLORS: Record<string, string> = {
-  FLIGHT: "bg-blue-500/10 border-blue-500/30",
-  HOTEL: "bg-purple-500/10 border-purple-500/30",
-  AIRBNB: "bg-pink-500/10 border-pink-500/30",
-  TRAIN: "bg-moss-tint/60 border-moss/30",
-  BUS: "bg-panel border-ink-faint",
-  RENTAL_CAR: "bg-gold-tint/60 border-gold/30",
-  FOOD_TOUR: "bg-orange-500/10 border-orange-500/30",
-  CITY_TOUR: "bg-cyan-500/10 border-cyan-500/30",
-  MUSEUM: "bg-indigo-500/10 border-indigo-500/30",
-  RESTAURANT: "bg-rose-500/10 border-rose-500/30",
-  ACTIVITY: "bg-yellow-500/10 border-yellow-500/30",
-  OTHER: "bg-panel border-ink-faint",
-};
-
-const NODE_COLORS: Record<string, string> = {
-  FLIGHT: "bg-blue-400",
-  HOTEL: "bg-purple-400",
-  AIRBNB: "bg-pink-400",
-  TRAIN: "bg-moss",
-  BUS: "bg-ink-muted",
-  RENTAL_CAR: "bg-gold",
-  FOOD_TOUR: "bg-orange-400",
-  CITY_TOUR: "bg-cyan-400",
-  MUSEUM: "bg-indigo-400",
-  RESTAURANT: "bg-rose-400",
-  ACTIVITY: "bg-yellow-500",
-  OTHER: "bg-ink-faint",
+const TYPE_TO_ACCENT: Record<string, ItineraryAccent> = {
+  HOTEL: "lodging",
+  AIRBNB: "lodging",
+  FLIGHT: "transit",
+  TRAIN: "transit",
+  BUS: "transit",
+  RENTAL_CAR: "transit",
+  RESTAURANT: "food",
+  FOOD_TOUR: "food",
+  CITY_TOUR: "activity",
+  MUSEUM: "activity",
+  ACTIVITY: "activity",
+  OTHER: "activity",
 };
 
 function parseUTCDate(dateStr: string): Date {
@@ -80,54 +32,520 @@ function toLocalDateKey(date: Date): string {
   return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}`;
 }
 
-type ItineraryEntry = Reservation & { stayRole?: "checkin" | "checkout" };
-type CityEntry = TripCity & { stayRole: "checkin" | "checkout" };
-
-function locationLabel(r: { city: string | null; state: string | null }): string {
-  return [r.city, r.state].filter(Boolean).join(", ");
+function dowLabel(dateKey: string): string {
+  return parseUTCDate(dateKey).toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
 }
 
-function dayLocationLabel(items: ItineraryEntry[]): string {
-  const checkout = items.find((r) => r.stayRole === "checkout");
-  const checkin = items.find((r) => r.stayRole === "checkin");
-
-  if (checkout && checkin) {
-    const from = locationLabel(checkout);
-    const to = locationLabel(checkin);
-    if (from && to && from !== to) return `${from} → ${to}`;
-    if (to) return to;
-    if (from) return from;
-  }
-
-  for (const item of items) {
-    const loc = locationLabel(item);
-    if (loc) return loc;
-  }
-
-  return "—";
+function dnumLabel(dateKey: string): string {
+  return String(parseUTCDate(dateKey).getUTCDate());
 }
 
-function buildItinerary(reservations: Reservation[]): Map<string, ItineraryEntry[]> {
-  const map = new Map<string, ItineraryEntry[]>();
-  for (const r of reservations) {
-    if (!r.startDate) continue;
-    const isStay = r.type === "HOTEL" || r.type === "AIRBNB";
-    const d = parseUTCDate(r.startDate);
+function formatMonthDay(dateKey: string): string {
+  return parseUTCDate(dateKey).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+}
+
+function formatTime12h(time: string): string {
+  const [hStr, mStr] = time.split(":");
+  let h = parseInt(hStr, 10);
+  const m = mStr ?? "00";
+  const suffix = h >= 12 ? "PM" : "AM";
+  h = h % 12;
+  if (h === 0) h = 12;
+  return `${h}:${m} ${suffix}`;
+}
+
+function formatDurationShort(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h${String(m).padStart(2, "0")}`;
+}
+
+function transitDurationLabel(event: EventEntry): string {
+  if (event.durationMinutes) return formatDurationShort(event.durationMinutes);
+  if (event.startTime && event.endTime) {
+    const [sh, sm] = event.startTime.split(":").map(Number);
+    const [eh, em] = event.endTime.split(":").map(Number);
+    let diff = eh * 60 + em - (sh * 60 + sm);
+    if (diff < 0) diff += 24 * 60;
+    return formatDurationShort(diff);
+  }
+  return "";
+}
+
+// Relative countdown chip ("In 2 weeks") for the pinned stay hero. Returns null
+// for past/ongoing dates rather than showing a negative or zero count.
+function relativeChip(dateKey: string): string | null {
+  const todayKey = toLocalDateKey(new Date());
+  if (dateKey <= todayKey) return null;
+  const diffDays = Math.round((parseUTCDate(dateKey).getTime() - parseUTCDate(todayKey).getTime()) / 86400000);
+  if (diffDays <= 0) return null;
+  if (diffDays === 1) return "Tomorrow";
+  if (diffDays < 14) return `In ${diffDays} days`;
+  if (diffDays < 60) return `In ${Math.round(diffDays / 7)} weeks`;
+  return `In ${Math.round(diffDays / 30)} months`;
+}
+
+function stayWhenLabel(stay: EventEntry): string {
+  const startKey = stay.startDate ? toLocalDateKey(parseUTCDate(stay.startDate)) : null;
+  const endKey = stay.endDate ? toLocalDateKey(parseUTCDate(stay.endDate)) : null;
+  let range = "";
+  if (startKey && endKey && startKey !== endKey) {
+    const startD = parseUTCDate(startKey);
+    const endD = parseUTCDate(endKey);
+    const sameMonth = startD.getUTCMonth() === endD.getUTCMonth() && startD.getUTCFullYear() === endD.getUTCFullYear();
+    range = sameMonth ? `${formatMonthDay(startKey)} – ${endD.getUTCDate()}` : `${formatMonthDay(startKey)} – ${formatMonthDay(endKey)}`;
+  } else if (startKey) {
+    range = formatMonthDay(startKey);
+  }
+  return [range, stay.provider].filter(Boolean).join(" · ");
+}
+
+function stayAddress(stay: EventEntry): string | null {
+  const parts = [stay.startLocation, stay.city, stay.state].filter(Boolean);
+  return parts.length > 0 ? parts.join(", ") : null;
+}
+
+function openDirections(stay: EventEntry) {
+  const query = stay.lat != null && stay.lng != null ? `${stay.lat},${stay.lng}` : stayAddress(stay) ?? stay.title;
+  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+// ── Data shapes ─────────────────────────────────────────────────────────────
+
+type EventEntry = Event & { stayRole?: "checkin" | "checkout" };
+type CityPlaceholderEntry = TripCity & { stayRole?: "checkin" | "checkout" };
+type DayItem =
+  | { kind: "event"; event: EventEntry; accent: ItineraryAccent }
+  | { kind: "placeholder"; city: CityPlaceholderEntry };
+
+type CityGroup = {
+  cityName: string;
+  events: Event[];
+  placeholders: TripCity[];
+  earliestKey: string;
+};
+
+type CitySectionData = {
+  cityName: string;
+  stay: EventEntry | null;
+  days: { dateKey: string; dow: string; dnum: string; items: DayItem[] }[];
+};
+
+function placeholderCityName(name: string): string {
+  const [city] = name.split(",");
+  return (city ?? name).trim();
+}
+
+// Reservations (now Events) whose checkin/checkout dates fall inside the
+// current city's span are synthesized into two calendar entries -- this is
+// the existing, working date logic from before the redesign, unchanged.
+function buildItinerary(events: Event[]): Map<string, EventEntry[]> {
+  const map = new Map<string, EventEntry[]>();
+  for (const e of events) {
+    if (!e.startDate) continue;
+    const isStay = e.type === "HOTEL" || e.type === "AIRBNB";
+    const d = parseUTCDate(e.startDate);
     const key = toLocalDateKey(d);
     if (!map.has(key)) map.set(key, []);
-    map.get(key)!.push({ ...r, stayRole: isStay ? "checkin" : undefined });
+    map.get(key)!.push({ ...e, stayRole: isStay ? "checkin" : undefined });
 
-    if (isStay && r.endDate) {
-      const endD = parseUTCDate(r.endDate);
-      const endKey = toLocalDateKey(endD);
+    if (isStay && e.endDate) {
+      const endKey = toLocalDateKey(parseUTCDate(e.endDate));
       if (!map.has(endKey)) map.set(endKey, []);
-      map.get(endKey)!.push({ ...r, stayRole: "checkout" });
+      map.get(endKey)!.push({ ...e, stayRole: "checkout" });
     }
   }
   return map;
 }
 
-// ── Inline city form ──────────────────────────────────────────────────────────
+function placeholdersForDay(placeholders: TripCity[], dateKey: string): CityPlaceholderEntry[] {
+  const checkins = placeholders
+    .filter((c) => c.targetStartDate!.slice(0, 10) === dateKey)
+    .map((c): CityPlaceholderEntry => ({ ...c, stayRole: "checkin" }));
+  const checkouts = placeholders
+    .filter(
+      (c) =>
+        c.targetEndDate &&
+        c.targetEndDate.slice(0, 10) === dateKey &&
+        c.targetEndDate.slice(0, 10) !== c.targetStartDate?.slice(0, 10)
+    )
+    .map((c): CityPlaceholderEntry => ({ ...c, stayRole: "checkout" }));
+  return [...checkouts, ...checkins];
+}
+
+function groupByCity(events: Event[], cities: TripCity[]) {
+  const groups = new Map<string, CityGroup>();
+  const undatedEvents: Event[] = [];
+  const undatedCities: TripCity[] = [];
+  const citylessDated: Event[] = [];
+
+  function ensure(cityName: string, dateKey: string): CityGroup {
+    const key = cityName.toLowerCase();
+    let g = groups.get(key);
+    if (!g) {
+      g = { cityName, events: [], placeholders: [], earliestKey: dateKey };
+      groups.set(key, g);
+    } else if (dateKey < g.earliestKey) {
+      g.earliestKey = dateKey;
+    }
+    return g;
+  }
+
+  function hasEventOnDay(g: CityGroup, dateKey: string): boolean {
+    return g.events.some((ev) => ev.startDate && toLocalDateKey(parseUTCDate(ev.startDate)) === dateKey);
+  }
+
+  function findGroupCoveringDay(dateKey: string, includePlaceholders: boolean): CityGroup | null {
+    for (const g of groups.values()) {
+      const coversDay =
+        hasEventOnDay(g, dateKey) ||
+        (includePlaceholders && g.placeholders.some((c) => c.targetStartDate?.slice(0, 10) === dateKey || c.targetEndDate?.slice(0, 10) === dateKey));
+      if (coversDay) return g;
+    }
+    return null;
+  }
+
+  // Pass 1: events with an explicit `city` are the authoritative groups.
+  for (const e of events) {
+    if (!e.startDate) {
+      undatedEvents.push(e);
+      continue;
+    }
+    const cityName = e.city?.trim();
+    const dateKey = toLocalDateKey(parseUTCDate(e.startDate));
+    if (cityName) {
+      ensure(cityName, dateKey).events.push(e);
+    } else {
+      citylessDated.push(e);
+    }
+  }
+
+  // Pass 2: TripCity placeholders. This model doubles as both "a whole city
+  // stop" and "an individual attraction reminder" (e.g. "Great Market Hall"
+  // on the same day as a Budapest stay) -- merge into a group only when a
+  // real EVENT (not another placeholder) covers that day. Matching against
+  // other placeholders would wrongly chain sequential city legs together,
+  // since one city's checkout date is routinely the next city's checkin date.
+  for (const c of cities) {
+    if (!c.targetStartDate) {
+      undatedCities.push(c);
+      continue;
+    }
+    const dateKey = c.targetStartDate.slice(0, 10);
+    const existing = findGroupCoveringDay(dateKey, false);
+    if (existing) {
+      existing.placeholders.push(c);
+    } else {
+      ensure(placeholderCityName(c.name), dateKey).placeholders.push(c);
+    }
+  }
+
+  // Pass 3: city-less dated events (flights/activities never get a `city`
+  // filled in manually since it's redundant with From/To or Location) --
+  // same same-day merge (events are lower risk of the chaining issue above,
+  // so placeholders count here too), falling back to a standalone
+  // "Unplanned" bucket only when no group covers that date at all.
+  for (const e of citylessDated) {
+    const dateKey = toLocalDateKey(parseUTCDate(e.startDate!));
+    const target = findGroupCoveringDay(dateKey, true);
+    (target ?? ensure("Unplanned", dateKey)).events.push(e);
+  }
+
+  const sections = Array.from(groups.values()).sort((a, b) => a.earliestKey.localeCompare(b.earliestKey));
+  return { sections, undatedEvents, undatedCities };
+}
+
+// Picks the pinned hero: the city's earliest lodging event that has a photo.
+// Reuses the existing checkin/checkout synthesis so the same stay still also
+// appears as separate compact rows in the day timeline (spec wants both).
+function buildCitySection(group: CityGroup): CitySectionData {
+  const dayMap = buildItinerary(group.events);
+
+  const allDateKeys = new Set<string>(dayMap.keys());
+  for (const c of group.placeholders) {
+    allDateKeys.add(c.targetStartDate!.slice(0, 10));
+    if (c.targetEndDate) allDateKeys.add(c.targetEndDate.slice(0, 10));
+  }
+  const dateKeys = Array.from(allDateKeys).sort();
+
+  const stayCandidates = group.events
+    .filter((e) => (e.type === "HOTEL" || e.type === "AIRBNB") && e.photoUrl && e.startDate)
+    .sort((a, b) => (a.startDate ?? "").localeCompare(b.startDate ?? ""));
+  const stay: EventEntry | null = stayCandidates[0] ? { ...stayCandidates[0] } : null;
+
+  const days = dateKeys.map((dateKey) => {
+    const eventsToday = dayMap.get(dateKey) ?? [];
+    const placeholdersToday = placeholdersForDay(group.placeholders, dateKey);
+
+    const items: DayItem[] = [
+      ...placeholdersToday.map((city): DayItem => ({ kind: "placeholder", city })),
+      ...eventsToday.map((event): DayItem => ({ kind: "event", event, accent: TYPE_TO_ACCENT[event.type] ?? "activity" })),
+    ];
+    items.sort((a, b) => {
+      const aOut = (a.kind === "event" ? a.event.stayRole : a.city.stayRole) === "checkout" ? 0 : 1;
+      const bOut = (b.kind === "event" ? b.event.stayRole : b.city.stayRole) === "checkout" ? 0 : 1;
+      return aOut - bOut;
+    });
+
+    return { dateKey, dow: dowLabel(dateKey), dnum: dnumLabel(dateKey), items };
+  });
+
+  return { cityName: group.cityName, stay, days };
+}
+
+// ── Leaf presentation components ─────────────────────────────────────────────
+
+function RowCard({
+  accent,
+  icon,
+  title,
+  sub,
+  muted,
+  routeStrip,
+  onClick,
+  participants,
+  friendMap,
+}: {
+  accent: ItineraryAccent;
+  icon: string;
+  title: string;
+  sub?: string;
+  muted?: boolean;
+  routeStrip?: React.ReactNode;
+  onClick?: () => void;
+  participants?: Array<{ friendId: string; inSplit: boolean }>;
+  friendMap?: Record<string, Friend>;
+}) {
+  return (
+    <div className={`bg-surface border rounded-[16px] overflow-hidden ${muted ? "border-dashed border-ink-faint" : "border-ink-faint"}`}>
+      <div
+        role={onClick ? "button" : undefined}
+        tabIndex={onClick ? 0 : undefined}
+        onClick={onClick}
+        onKeyDown={onClick ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } } : undefined}
+        className={`flex items-center gap-[15px] px-[17px] py-[15px] ${onClick ? "cursor-pointer hover:bg-ink/[0.03] transition-colors" : ""}`}
+      >
+        <IconTile accent={accent} icon={icon} muted={muted} />
+        <div className="flex-1 min-w-0">
+          <div className="font-sans text-[16.5px] font-bold tracking-tight text-ink truncate">{title}</div>
+          {sub && <div className="font-sans text-[13.5px] text-ink-muted mt-0.5 truncate">{sub}</div>}
+          {participants && friendMap && participants.length > 0 && (
+            <div className="flex -space-x-2 mt-2">
+              {participants.map((p) => {
+                const friend = friendMap[p.friendId];
+                return (
+                  <div
+                    key={p.friendId}
+                    className="w-6 h-6 rounded-full border border-surface bg-ink-faint flex items-center justify-center flex-shrink-0 overflow-hidden"
+                    title={friend?.name ?? "Unknown"}
+                  >
+                    {friend?.avatarUrl ? (
+                      <img
+                        src={friend.avatarUrl}
+                        alt={friend.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-[10px] font-medium text-ink">
+                        {friend?.name?.charAt(0).toUpperCase() ?? "?"}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+      {routeStrip}
+    </div>
+  );
+}
+
+function PhotoHero({
+  kind,
+  photoUrl,
+  title,
+  when,
+  chip,
+  address,
+  onDirections,
+  onViewClick,
+}: {
+  kind: "stay" | "experience";
+  photoUrl: string;
+  title: string;
+  when: string;
+  chip?: string;
+  address?: string | null;
+  onDirections?: () => void;
+  onViewClick?: () => void;
+}) {
+  const isStay = kind === "stay";
+  return (
+    <div className="bg-surface border border-ink-faint rounded-[20px] overflow-hidden">
+      <div className="relative">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={photoUrl} alt={title} className={`w-full object-cover block ${isStay ? "h-[210px]" : "h-[190px]"}`} />
+        {chip && (
+          <span className="font-sans absolute top-3.5 left-3.5 bg-surface text-ink text-[13px] font-semibold px-[13px] py-[7px] rounded-[20px] border border-ink-faint">
+            {chip}
+          </span>
+        )}
+      </div>
+      <div className={isStay ? "px-5 pt-[18px] pb-5" : "px-[18px] pt-4 pb-[18px]"}>
+        <h2
+          className={
+            isStay
+              ? "font-display text-[25px] font-bold tracking-tight text-ink"
+              : "font-display text-xl font-bold tracking-tight text-ink leading-[1.22]"
+          }
+        >
+          {title}
+        </h2>
+        <div className="font-sans text-[15px] text-ink-muted mt-[5px]">{when}</div>
+        {isStay ? (
+          <>
+            <hr className="border-t border-ink-faint my-4" />
+            <div className="flex items-center justify-between gap-3.5">
+              {address && <div className="font-sans text-sm text-ink-muted leading-snug flex-1 min-w-0">{address}</div>}
+              {onDirections && (
+                <button
+                  onClick={onDirections}
+                  className="font-sans flex-shrink-0 whitespace-nowrap border border-ink-faint bg-surface text-ink text-[15px] font-semibold px-5 py-3 rounded-[12px] hover:border-moss hover:text-moss transition-colors"
+                >
+                  Get directions
+                </button>
+              )}
+            </div>
+          </>
+        ) : (
+          onViewClick && (
+            <button
+              onClick={onViewClick}
+              className="font-sans w-full mt-[15px] border border-ink-faint bg-surface text-ink text-[15px] font-bold py-[13px] rounded-[12px] hover:border-moss hover:text-moss transition-colors"
+            >
+              View experience
+            </button>
+          )
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TimelineBlock({
+  dow,
+  dnum,
+  isContinuation,
+  accent,
+  muted,
+  children,
+}: {
+  dow: string;
+  dnum: string;
+  isContinuation: boolean;
+  accent: ItineraryAccent | null;
+  muted?: boolean;
+  children: React.ReactNode;
+}) {
+  const tickColor = muted || !accent
+    ? "bg-ink-faint"
+    : accent === "lodging"
+    ? "bg-lodging"
+    : accent === "transit"
+    ? "bg-transit"
+    : accent === "food"
+    ? "bg-food"
+    : "bg-gold";
+
+  return (
+    <div className="grid items-start" style={{ gridTemplateColumns: "52px 1fr", columnGap: "14px" }}>
+      <div className="relative flex flex-col items-center self-stretch">
+        <div className="absolute inset-y-0 w-px bg-ink-faint" />
+        {!isContinuation ? (
+          <div className="relative z-10 mt-0.5 text-center">
+            <div className="font-sans text-[13px] font-medium text-ink-muted leading-none">{dow}</div>
+            <div className="font-sans w-[38px] h-[38px] mt-1 rounded-full bg-surface border border-ink-faint flex items-center justify-center text-[17px] font-bold text-ink">
+              {dnum}
+            </div>
+          </div>
+        ) : (
+          <div className="invisible h-0" />
+        )}
+        <div
+          className={`relative z-10 w-2.5 h-2.5 rounded-full shadow-[0_0_0_4px_var(--color-bg)] ${tickColor} ${isContinuation ? "mt-6" : "mt-2.5"}`}
+        />
+      </div>
+      <div className="min-w-0 pb-5">{children}</div>
+    </div>
+  );
+}
+
+function EventCard({
+  event,
+  accent,
+  isPinnedStay,
+  onEdit,
+  friendMap,
+}: {
+  event: EventEntry;
+  accent: ItineraryAccent;
+  isPinnedStay: boolean;
+  onEdit: () => void;
+  friendMap: Record<string, Friend>;
+}) {
+  const variant: "hero" | "row" = !isPinnedStay && !!event.photoUrl && accent !== "transit" ? "hero" : "row";
+
+  if (variant === "hero") {
+    return (
+      <PhotoHero
+        kind="experience"
+        photoUrl={event.photoUrl!}
+        title={event.title}
+        when={[event.startTime, event.provider].filter(Boolean).join(" · ")}
+        onViewClick={onEdit}
+      />
+    );
+  }
+
+  const isCheckin = event.stayRole === "checkin";
+  const isCheckout = event.stayRole === "checkout";
+  const icon = isCheckin || isCheckout ? "🚪" : EVENT_ICONS[event.type] ?? "📋";
+
+  let title: string;
+  let sub: string;
+  if (isCheckin || isCheckout) {
+    title = isCheckin
+      ? event.startTime
+        ? `Check in after ${formatTime12h(event.startTime)}`
+        : "Check in"
+      : event.endTime
+      ? `Check out before ${formatTime12h(event.endTime)}`
+      : "Check out";
+    sub = [event.title, event.provider].filter(Boolean).join(" · ");
+  } else if (accent === "transit") {
+    title = event.title;
+    sub = [[event.startLocation, event.endLocation].filter(Boolean).join(" → "), transitDurationLabel(event) || null]
+      .filter(Boolean)
+      .join(" · ");
+  } else {
+    title = event.title;
+    sub = [event.startTime, event.provider].filter(Boolean).join(" · ");
+  }
+
+  const from = event.startLocation && event.startTime ? { place: event.startLocation, time: event.startTime } : null;
+  const to = event.endLocation && event.endTime ? { place: event.endLocation, time: event.endTime } : null;
+  const routeStrip =
+    accent === "transit" && from && to ? <RouteStrip from={from} to={to} duration={transitDurationLabel(event)} /> : undefined;
+
+  return <RowCard accent={accent} icon={icon} title={title} sub={sub} onClick={onEdit} routeStrip={routeStrip} participants={event.participants} friendMap={friendMap} />;
+}
+
+// ── Planned-stop (TripCity) inline form + row ────────────────────────────────
 
 const inputCls = "w-full border border-ink-faint bg-white px-3 py-1.5 text-sm text-ink placeholder:text-ink-muted focus:border-moss focus:outline-none";
 
@@ -163,7 +581,7 @@ function CityForm({
   }
 
   return (
-    <form onSubmit={submit} className="border border-gold/40 bg-gold-tint/30 p-4 space-y-3">
+    <form onSubmit={submit} className="border border-gold/40 bg-gold-tint/30 p-4 space-y-3 rounded-[16px]">
       <p className="text-xs font-medium text-gold uppercase tracking-wide">{initial ? "Edit stop" : "Add a planned stop"}</p>
       <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="City or destination" className={inputCls} autoFocus required />
       <div className="grid grid-cols-2 gap-3">
@@ -178,10 +596,10 @@ function CityForm({
       </div>
       <input type="text" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes (optional)" className={inputCls} />
       <div className="flex gap-2">
-        <button type="submit" disabled={saving || !name.trim()} className="bg-moss text-white text-xs px-4 py-2 hover:bg-moss-dark disabled:opacity-50">
+        <button type="submit" disabled={saving || !name.trim()} className="bg-moss text-white text-xs px-4 py-2 rounded-[12px] hover:bg-moss-dark disabled:opacity-50">
           {saving ? "Saving…" : initial ? "Save" : "Add stop"}
         </button>
-        <button type="button" onClick={onCancel} className="text-xs px-4 py-2 border border-ink-faint text-ink-muted hover:text-ink">
+        <button type="button" onClick={onCancel} className="text-xs px-4 py-2 border border-ink-faint text-ink-muted rounded-[12px] hover:text-ink">
           Cancel
         </button>
       </div>
@@ -189,9 +607,7 @@ function CityForm({
   );
 }
 
-// ── CityPlaceholder card ───────────────────────────────────────────────────────
-
-function CityPlaceholder({
+function CityPlaceholderRow({
   city,
   tripId,
   onEdit,
@@ -210,229 +626,198 @@ function CityPlaceholder({
     if (res.ok) onDelete();
   }
 
-  function toDateKey(s: string) { return s.slice(0, 10); }
-  function parseDateKey(s: string) { return new Date(toDateKey(s) + "T12:00:00Z"); }
-
-  let nights: number | null = null;
-  if (city.targetStartDate && city.targetEndDate) {
-    nights = Math.round((parseDateKey(city.targetEndDate).getTime() - parseDateKey(city.targetStartDate).getTime()) / 86400000);
-  }
-
   const isCheckout = stayRole === "checkout";
   const icon = isCheckout ? "🔓" : "📍";
-  const nodeColor = isCheckout ? "bg-gold/50" : "bg-gold";
+  const sub = stayRole ? (isCheckout ? "planned checkout" : "planned check-in") : "planned stop";
 
   return (
-    <div className="flex gap-3 items-start">
-      <div className="flex-shrink-0 flex flex-col items-center pt-3.5">
-        <div className={`w-2.5 h-2.5 rounded-full z-10 ${nodeColor}`} />
-      </div>
-      <div className="flex-1 border border-gold/40 border-dashed bg-gold-tint/20 px-4 py-3 flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="text-base leading-none mt-0.5 flex-shrink-0">{icon}</span>
-            <span className="font-medium text-ink text-sm">{city.name}</span>
+    <div className="bg-surface border border-dashed border-ink-faint rounded-[16px] overflow-hidden">
+      <div className="flex items-center gap-[15px] px-[17px] py-[15px]">
+        <IconTile accent="activity" icon={icon} muted />
+        <div className="flex-1 min-w-0">
+          <div className="font-sans text-[16.5px] font-bold tracking-tight text-ink truncate">{city.name}</div>
+          <div className="font-sans text-[13.5px] text-ink-muted mt-0.5 truncate">
+            {sub}
+            {city.notes ? ` · ${city.notes}` : ""}
           </div>
-          {stayRole ? (
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className={`text-xs font-medium px-2 py-0.5 rounded leading-none ${
-                stayRole === "checkin" ? "bg-gold/15 text-gold" : "bg-ink-muted/10 text-ink-muted"
-              }`}>
-                {stayRole === "checkin" ? "CHECK-IN" : "CHECK-OUT"}
-              </span>
-              {stayRole === "checkin" && nights !== null && nights > 0 && (
-                <span className="text-xs text-ink-muted font-mono">{nights}n</span>
-              )}
-            </div>
-          ) : (
-            <p className="text-xs text-ink-muted font-mono mt-0.5">planned stop</p>
-          )}
-          {city.notes && <p className="text-xs text-ink-muted italic mt-1">{city.notes}</p>}
         </div>
         <div className="flex gap-1 flex-shrink-0">
-          <button onClick={onEdit} className="text-xs text-ink-muted hover:text-ink px-1.5 py-1">Edit</button>
-          <button onClick={handleDelete} className="text-xs text-ink-muted hover:text-red-600 px-1.5 py-1">✕</button>
+          <button onClick={onEdit} className="font-sans text-xs text-ink-muted hover:text-ink px-1.5 py-1">Edit</button>
+          <button onClick={handleDelete} className="font-sans text-xs text-ink-muted hover:text-red-600 px-1.5 py-1">✕</button>
         </div>
       </div>
     </div>
   );
 }
 
-// ── Main view ─────────────────────────────────────────────────────────────────
+// ── City section ──────────────────────────────────────────────────────────
+
+function CitySectionView({
+  section,
+  tripId,
+  cities,
+  editingCityId,
+  setEditingCityId,
+  updateCities,
+  onEditEvent,
+  onAddEvent,
+  nextCityName,
+  friendMap,
+}: {
+  section: CitySectionData;
+  tripId: string;
+  cities: TripCity[];
+  editingCityId: string | null;
+  setEditingCityId: (id: string | null) => void;
+  updateCities: (cities: TripCity[]) => void;
+  onEditEvent: (event: Event) => void;
+  onAddEvent: (cityName: string) => void;
+  nextCityName: string | null;
+  friendMap: Record<string, Friend>;
+}) {
+  return (
+    <div>
+      <h1 className="font-display text-[26px] font-extrabold tracking-tight text-ink mb-4">{section.cityName}</h1>
+
+      {section.stay && (
+        <div className="mb-4">
+          <PhotoHero
+            kind="stay"
+            photoUrl={section.stay.photoUrl!}
+            title={section.stay.title}
+            when={stayWhenLabel(section.stay)}
+            chip={section.stay.startDate ? relativeChip(toLocalDateKey(parseUTCDate(section.stay.startDate))) ?? undefined : undefined}
+            address={stayAddress(section.stay)}
+            onDirections={() => openDirections(section.stay!)}
+          />
+        </div>
+      )}
+
+      <div>
+        {section.days.map((day) =>
+          day.items.map((item, i) => (
+            <TimelineBlock
+              key={item.kind === "event" ? `${item.event.id}-${item.event.stayRole ?? ""}` : `${item.city.id}-${item.city.stayRole ?? ""}`}
+              dow={day.dow}
+              dnum={day.dnum}
+              isContinuation={i > 0}
+              accent={item.kind === "event" ? item.accent : null}
+              muted={item.kind === "placeholder"}
+            >
+              {item.kind === "placeholder" ? (
+                editingCityId === item.city.id ? (
+                  <CityForm
+                    tripId={tripId}
+                    initial={item.city}
+                    onSave={(updated) => {
+                      updateCities(cities.map((c) => (c.id === updated.id ? updated : c)));
+                      setEditingCityId(null);
+                    }}
+                    onCancel={() => setEditingCityId(null)}
+                  />
+                ) : (
+                  <CityPlaceholderRow
+                    city={item.city}
+                    tripId={tripId}
+                    stayRole={item.city.stayRole}
+                    onEdit={() => setEditingCityId(item.city.id)}
+                    onDelete={() => updateCities(cities.filter((c) => c.id !== item.city.id))}
+                  />
+                )
+              ) : (
+                <EventCard
+                  event={item.event}
+                  accent={item.accent}
+                  isPinnedStay={!!section.stay && item.event.id === section.stay.id}
+                  onEdit={() => onEditEvent(item.event)}
+                  friendMap={friendMap}
+                />
+              )}
+            </TimelineBlock>
+          ))
+        )}
+      </div>
+
+      <button
+        onClick={() => onAddEvent(section.cityName)}
+        className="font-sans w-full mt-1.5 border-[1.5px] border-dashed border-ink-faint text-ink-muted text-[14.5px] font-semibold py-3.5 rounded-[14px] hover:border-moss hover:text-moss transition-colors"
+      >
+        ＋ Add event
+      </button>
+
+      {nextCityName && <div className="mt-8 font-display text-[22px] font-extrabold text-ink-muted">{nextCityName} →</div>}
+    </div>
+  );
+}
+
+// ── Main view ─────────────────────────────────────────────────────────────
 
 export default function ItineraryView({
   tripId,
-  reservations,
+  events,
   cities: initialCities,
   friendMap,
   onCitiesUpdate,
-  addTrigger = 0,
+  onEventSaved,
 }: {
   tripId: string;
-  reservations: Reservation[];
+  events: Event[];
   cities: TripCity[];
   friendMap: Record<string, Friend>;
   onCitiesUpdate: (cities: TripCity[]) => void;
-  addTrigger?: number;
+  onEventSaved: (event: Event) => void;
 }) {
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [cities, setCities] = useState<TripCity[]>(initialCities);
-  const [showAddForm, setShowAddForm] = useState(false);
   const [editingCityId, setEditingCityId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (addTrigger > 0) {
-      setShowAddForm(true);
-      setTimeout(() => document.querySelector<HTMLInputElement>('input[placeholder="City or destination"]')?.focus(), 50);
-    }
-  }, [addTrigger]);
+  const [eventPrefill, setEventPrefill] = useState<Partial<EventFormShape> | null>(null);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
 
   function updateCities(updated: TripCity[]) {
     setCities(updated);
     onCitiesUpdate(updated);
   }
 
-  const itinerary = buildItinerary(reservations);
-  const undated = reservations.filter((r) => !r.startDate);
+  const { sections: cityGroups, undatedEvents, undatedCities } = groupByCity(events, cities);
+  const citySections = cityGroups.map(buildCitySection);
 
-  const datedCities = cities.filter((c) => !!c.targetStartDate);
-  const undatedCities = cities.filter((c) => !c.targetStartDate);
-
-  function citiesForDay(dateKey: string): CityEntry[] {
-    const checkins = datedCities
-      .filter((c) => c.targetStartDate!.slice(0, 10) === dateKey)
-      .map((c): CityEntry => ({ ...c, stayRole: "checkin" }));
-    const checkouts = datedCities
-      .filter((c) =>
-        c.targetEndDate &&
-        c.targetEndDate.slice(0, 10) === dateKey &&
-        c.targetEndDate.slice(0, 10) !== c.targetStartDate?.slice(0, 10)
-      )
-      .map((c): CityEntry => ({ ...c, stayRole: "checkout" }));
-    return [...checkouts, ...checkins];
-  }
-
-  const allEmpty = itinerary.size === 0 && undated.length === 0 && cities.length === 0;
-
-  // Build sorted list of all day keys (reservations + all dated cities, including checkout days)
-  const allDateKeys = new Set([
-    ...Array.from(itinerary.keys()),
-    ...datedCities.map((c) => c.targetStartDate!.slice(0, 10)),
-    ...datedCities.filter((c) => c.targetEndDate).map((c) => c.targetEndDate!.slice(0, 10)),
-  ]);
-  const days = Array.from(allDateKeys).sort();
-  const firstDate = days.length > 0 ? new Date(days[0] + "T12:00:00Z") : null;
-
-  function dayNum(dateKey: string): number {
-    if (!firstDate) return 1;
-    const d = new Date(dateKey + "T12:00:00Z");
-    return Math.round((d.getTime() - firstDate.getTime()) / 86400000) + 1;
-  }
+  const allEmpty = citySections.length === 0 && undatedEvents.length === 0 && undatedCities.length === 0;
 
   return (
     <div className="space-y-10">
       {allEmpty && (
-        <div className="border border-ink-faint border-dashed p-12 text-center">
+        <div className="border border-ink-faint border-dashed p-12 text-center rounded-[16px]">
           <p className="text-4xl mb-3">🗺</p>
-          <p className="font-display italic text-xl text-ink-muted mb-1">Nothing scheduled yet</p>
-          <p className="text-sm text-ink-muted">Add a planned stop or reservation to build your itinerary.</p>
+          <p className="font-display text-xl text-ink-muted mb-1">Nothing scheduled yet</p>
+          <p className="font-sans text-sm text-ink-muted">Add a planned stop or event to build your itinerary.</p>
         </div>
       )}
 
-      {days.map((dateKey) => {
-        const reservations = itinerary.get(dateKey) ?? [];
-        const citiesHere = citiesForDay(dateKey);
-        const date = new Date(dateKey + "T12:00:00Z");
-        const num = dayNum(dateKey);
+      {citySections.map((section, i) => (
+        <CitySectionView
+          key={section.cityName}
+          section={section}
+          tripId={tripId}
+          cities={cities}
+          editingCityId={editingCityId}
+          setEditingCityId={setEditingCityId}
+          updateCities={updateCities}
+          onEditEvent={(event) => setEditingEvent(event)}
+          onAddEvent={(cityName) => setEventPrefill({ type: "ACTIVITY", city: cityName })}
+          nextCityName={i < citySections.length - 1 ? citySections[i + 1].cityName : null}
+          friendMap={friendMap}
+        />
+      ))}
 
-        type DayEntry =
-          | { kind: "reservation"; entry: ItineraryEntry }
-          | { kind: "city"; entry: CityEntry };
-
-        const dayEntries: DayEntry[] = [
-          ...citiesHere.map((c): DayEntry => ({ kind: "city", entry: c })),
-          ...reservations.map((r): DayEntry => ({ kind: "reservation", entry: r })),
-        ].sort((a, b) => (a.entry.stayRole === "checkout" ? 0 : 1) - (b.entry.stayRole === "checkout" ? 0 : 1));
-
-        return (
-          <div key={dateKey}>
-            <div className="mb-5">
-              <div className="flex items-baseline gap-3 mb-0.5">
-                <span className={`text-xs font-mono px-2 py-1 leading-none flex-shrink-0 ${reservations.length > 0 ? "bg-moss text-white" : "bg-gold text-white"}`}>
-                  Day {num}
-                </span>
-                <h3 className="font-display italic font-bold text-ink leading-none" style={{ fontSize: "clamp(1.5rem, 3vw, 2.25rem)" }}>
-                  {reservations.length > 0 ? dayLocationLabel(reservations) : citiesHere[0]?.name ?? "—"}
-                </h3>
-              </div>
-              <div className="flex items-center gap-3 mt-1.5">
-                <span className="text-sm font-mono text-ink-muted">
-                  {date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
-                </span>
-                <div className="flex-1 h-px bg-ink-faint" />
-              </div>
-            </div>
-
-            <div className="relative ml-4">
-              {dayEntries.length > 1 && (
-                <div className="absolute left-[5px] top-4 bottom-4 w-px bg-ink-faint" />
-              )}
-              <div className="space-y-3">
-                {dayEntries.map((item) =>
-                  item.kind === "city" ? (
-                    editingCityId === item.entry.id && item.entry.stayRole === "checkin" ? (
-                      <CityForm
-                        key={`${item.entry.id}-${item.entry.stayRole}`}
-                        tripId={tripId}
-                        initial={item.entry}
-                        onSave={(updated) => {
-                          updateCities(cities.map((c) => c.id === updated.id ? updated : c));
-                          setEditingCityId(null);
-                        }}
-                        onCancel={() => setEditingCityId(null)}
-                      />
-                    ) : (
-                      <CityPlaceholder
-                        key={`${item.entry.id}-${item.entry.stayRole}`}
-                        city={item.entry}
-                        tripId={tripId}
-                        stayRole={item.entry.stayRole}
-                        onEdit={() => setEditingCityId(item.entry.id)}
-                        onDelete={() => updateCities(cities.filter((c) => c.id !== item.entry.id))}
-                      />
-                    )
-                  ) : (
-                    <ReservationCard
-                      key={item.entry.id}
-                      reservation={item.entry}
-                      expanded={expandedId === item.entry.id}
-                      onToggle={() => setExpandedId(prev => prev === item.entry.id ? null : item.entry.id)}
-                      friendMap={friendMap}
-                    />
-                  )
-                )}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-
-      {undated.length > 0 && (
+      {undatedEvents.length > 0 && (
         <div>
           <div className="flex items-center gap-3 mb-5">
             <span className="text-xs font-mono bg-ink-muted text-white px-2 py-1 leading-none">TBD</span>
-            <span className="font-display italic text-lg text-ink-muted">Date not set</span>
+            <span className="font-display text-lg text-ink-muted">Date not set</span>
             <div className="flex-1 h-px bg-ink-faint" />
           </div>
-          <div className="ml-4 space-y-3">
-            {undated.map((r) => (
-              <ReservationCard
-                key={r.id}
-                reservation={r}
-                expanded={expandedId === r.id}
-                onToggle={() => setExpandedId(prev => prev === r.id ? null : r.id)}
-                friendMap={friendMap}
-              />
+          <div className="space-y-3">
+            {undatedEvents.map((e) => (
+              <EventCard key={e.id} event={e} accent={TYPE_TO_ACCENT[e.type] ?? "activity"} isPinnedStay={false} onEdit={() => setEditingEvent(e)} friendMap={friendMap} />
             ))}
           </div>
         </div>
@@ -442,10 +827,10 @@ export default function ItineraryView({
         <div>
           <div className="flex items-center gap-3 mb-5">
             <span className="text-xs font-mono bg-gold text-white px-2 py-1 leading-none">TBD</span>
-            <span className="font-display italic text-lg text-ink-muted">Dates not set</span>
+            <span className="font-display text-lg text-ink-muted">Dates not set</span>
             <div className="flex-1 h-px bg-ink-faint" />
           </div>
-          <div className="ml-4 space-y-3">
+          <div className="space-y-3">
             {undatedCities.map((c) =>
               editingCityId === c.id ? (
                 <CityForm
@@ -453,177 +838,36 @@ export default function ItineraryView({
                   tripId={tripId}
                   initial={c}
                   onSave={(updated) => {
-                    updateCities(cities.map((x) => x.id === updated.id ? updated : x));
+                    updateCities(cities.map((x) => (x.id === updated.id ? updated : x)));
                     setEditingCityId(null);
                   }}
                   onCancel={() => setEditingCityId(null)}
                 />
               ) : (
-                <CityPlaceholder
-                  key={c.id}
-                  city={c}
-                  tripId={tripId}
-                  onEdit={() => setEditingCityId(c.id)}
-                  onDelete={() => updateCities(cities.filter((x) => x.id !== c.id))}
-                />
+                <CityPlaceholderRow key={c.id} city={c} tripId={tripId} onEdit={() => setEditingCityId(c.id)} onDelete={() => updateCities(cities.filter((x) => x.id !== c.id))} />
               )
             )}
           </div>
         </div>
       )}
 
-      {showAddForm && (
-        <CityForm
+      {(eventPrefill || editingEvent) && (
+        <EventFormModal
           tripId={tripId}
-          onSave={(newCity) => {
-            updateCities([...cities, newCity]);
-            setShowAddForm(false);
+          friendMap={friendMap}
+          prefill={eventPrefill ?? undefined}
+          editingEvent={editingEvent}
+          onSaved={(saved) => {
+            onEventSaved(saved);
+            setEventPrefill(null);
+            setEditingEvent(null);
           }}
-          onCancel={() => setShowAddForm(false)}
+          onClose={() => {
+            setEventPrefill(null);
+            setEditingEvent(null);
+          }}
         />
       )}
-    </div>
-  );
-}
-
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-  const copy = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    });
-  }, [text]);
-
-  return (
-    <button
-      onClick={copy}
-      title="Copy address"
-      className={`flex-shrink-0 text-xs px-1.5 py-0.5 border transition-colors ${
-        copied
-          ? "border-moss/40 text-moss bg-moss/8"
-          : "border-ink-faint text-ink-muted hover:border-moss/40 hover:text-moss"
-      }`}
-    >
-      {copied ? "Copied" : "Copy"}
-    </button>
-  );
-}
-
-function ReservationCard({
-  reservation: r,
-  expanded,
-  onToggle,
-  friendMap,
-}: {
-  reservation: ItineraryEntry;
-  expanded: boolean;
-  onToggle: () => void;
-  friendMap: Record<string, Friend>;
-}) {
-  const customColor = r.color ? BOOKING_COLORS.find(c => c.id === r.color) : null;
-  const nodeColor = customColor ? customColor.swatch : (NODE_COLORS[r.type] ?? "bg-ink-muted");
-  const cardStyle = customColor ? customColor.card : (COLORS[r.type] ?? "bg-panel border-ink-faint");
-  const isStay = r.type === "HOTEL" || r.type === "AIRBNB";
-  const isCheckout = r.stayRole === "checkout";
-  const icon = isCheckout ? "🔓" : (ICONS[r.type] ?? "📋");
-  const addressParts = isStay ? [r.startLocation, r.city, r.state].filter(Boolean) : [];
-  const address = addressParts.length > 0 ? addressParts.join(", ") : null;
-
-  return (
-    <div className="flex gap-3 items-start">
-      <div className="flex-shrink-0 flex flex-col items-center pt-3.5">
-        <div className={`w-2.5 h-2.5 rounded-full z-10 ${nodeColor}`} />
-      </div>
-
-      <div className={`flex-1 border ${cardStyle} overflow-hidden transition-all duration-200`}>
-        <button
-          onClick={onToggle}
-          className="w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-ink/[0.04] transition-colors"
-        >
-          <span className="text-base leading-none mt-0.5 flex-shrink-0">{icon}</span>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 flex-wrap min-w-0">
-                <span className="font-medium text-ink text-sm leading-snug">{r.title}</span>
-                {!r.stayRole && (
-                  <span className="text-xs text-ink-muted">{r.type.replace(/_/g, " ").toLowerCase()}</span>
-                )}
-              </div>
-              {isStay && r.provider && (
-                <span className="text-xs text-ink-muted flex-shrink-0">{r.provider}</span>
-              )}
-            </div>
-            {r.stayRole ? (
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className={`text-xs font-medium px-2 py-0.5 rounded leading-none font-mono ${
-                  r.stayRole === "checkin"
-                    ? "bg-moss/10 text-moss"
-                    : "bg-gold/15 text-gold"
-                }`}>
-                  {r.stayRole === "checkin"
-                    ? `CHECK-IN${r.startTime ? `  ${r.startTime}` : ""}`
-                    : `CHECK-OUT${r.endTime ? `  ${r.endTime}` : ""}`}
-                </span>
-              </div>
-            ) : (
-              r.startTime && <p className="text-xs text-ink-muted font-mono mt-0.5">{r.startTime}</p>
-            )}
-          </div>
-          {r.participants.length > 0 && !expanded && (
-            <AvatarStack
-              friends={r.participants
-                .map((p) => friendMap[p.friendId])
-                .filter(Boolean) as Friend[]}
-            />
-          )}
-          <span className={`text-ink-faint text-xs flex-shrink-0 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}>▾</span>
-        </button>
-
-        {expanded && (
-          <div className="px-4 pb-4 pt-0 border-t border-ink/10">
-            {address && (
-              <div className="flex items-center gap-2 mt-3 mb-1">
-                <span className="text-xs text-ink-muted flex-shrink-0">Address</span>
-                <span className="text-xs text-ink flex-1 min-w-0">{address}</span>
-                <CopyButton text={address} />
-              </div>
-            )}
-            <dl className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs mt-3">
-              {r.confirmationCode && <><dt className="text-ink-muted">Confirmation</dt><dd className="text-ink font-mono font-medium">{r.confirmationCode}</dd></>}
-              {r.startDate && <><dt className="text-ink-muted">Date</dt><dd className="text-ink">{r.endDate && r.endDate !== r.startDate ? `${formatDate(r.startDate)} → ${formatDate(r.endDate)}` : formatDate(r.startDate)}</dd></>}
-              {r.durationMinutes && <><dt className="text-ink-muted">Duration</dt><dd className="text-ink">{r.durationMinutes} min</dd></>}
-              {r.price && <><dt className="text-ink-muted">Price</dt><dd className="text-ink">{formatPrice(r.price, r.currency)}</dd></>}
-            </dl>
-            {r.notes && <p className="text-xs text-ink-muted italic mt-3 pt-3 border-t border-ink/10">{r.notes}</p>}
-            {r.participants.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-3">
-                {r.participants.map((p) => (
-                  <span key={p.friendId} className="text-xs bg-surface/80 text-ink-muted px-1.5 py-0.5 border border-ink-faint">
-                    {friendMap[p.friendId]?.name ?? "Friend"}
-                  </span>
-                ))}
-              </div>
-            )}
-            {r.attachments.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {r.attachments.map((a) => (
-                  <a
-                    key={a.id}
-                    href={`/api/media/${a.filename}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-moss hover:underline"
-                  >
-                    📎 {a.originalName}
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
     </div>
   );
 }

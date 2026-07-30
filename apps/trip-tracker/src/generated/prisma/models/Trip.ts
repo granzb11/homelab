@@ -264,11 +264,12 @@ export type TripWhereInput = {
   budget?: Prisma.DecimalNullableFilter<"Trip"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.StringNullableFilter<"Trip"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
-  reservations?: Prisma.ReservationListRelationFilter
+  events?: Prisma.EventListRelationFilter
   expenses?: Prisma.ExpenseListRelationFilter
   participants?: Prisma.TripParticipantListRelationFilter
   todos?: Prisma.BookingTodoListRelationFilter
   cities?: Prisma.TripCityListRelationFilter
+  restaurants?: Prisma.RestaurantListRelationFilter
 }
 
 export type TripOrderByWithRelationInput = {
@@ -283,11 +284,12 @@ export type TripOrderByWithRelationInput = {
   budget?: Prisma.SortOrderInput | Prisma.SortOrder
   hangoutEventId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  reservations?: Prisma.ReservationOrderByRelationAggregateInput
+  events?: Prisma.EventOrderByRelationAggregateInput
   expenses?: Prisma.ExpenseOrderByRelationAggregateInput
   participants?: Prisma.TripParticipantOrderByRelationAggregateInput
   todos?: Prisma.BookingTodoOrderByRelationAggregateInput
   cities?: Prisma.TripCityOrderByRelationAggregateInput
+  restaurants?: Prisma.RestaurantOrderByRelationAggregateInput
 }
 
 export type TripWhereUniqueInput = Prisma.AtLeast<{
@@ -305,11 +307,12 @@ export type TripWhereUniqueInput = Prisma.AtLeast<{
   budget?: Prisma.DecimalNullableFilter<"Trip"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.StringNullableFilter<"Trip"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
-  reservations?: Prisma.ReservationListRelationFilter
+  events?: Prisma.EventListRelationFilter
   expenses?: Prisma.ExpenseListRelationFilter
   participants?: Prisma.TripParticipantListRelationFilter
   todos?: Prisma.BookingTodoListRelationFilter
   cities?: Prisma.TripCityListRelationFilter
+  restaurants?: Prisma.RestaurantListRelationFilter
 }, "id">
 
 export type TripOrderByWithAggregationInput = {
@@ -360,11 +363,12 @@ export type TripCreateInput = {
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
   createdAt?: Date | string
-  reservations?: Prisma.ReservationCreateNestedManyWithoutTripInput
+  events?: Prisma.EventCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTripInput
   participants?: Prisma.TripParticipantCreateNestedManyWithoutTripInput
   todos?: Prisma.BookingTodoCreateNestedManyWithoutTripInput
   cities?: Prisma.TripCityCreateNestedManyWithoutTripInput
+  restaurants?: Prisma.RestaurantCreateNestedManyWithoutTripInput
 }
 
 export type TripUncheckedCreateInput = {
@@ -379,11 +383,12 @@ export type TripUncheckedCreateInput = {
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
   createdAt?: Date | string
-  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutTripInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTripInput
   participants?: Prisma.TripParticipantUncheckedCreateNestedManyWithoutTripInput
   todos?: Prisma.BookingTodoUncheckedCreateNestedManyWithoutTripInput
   cities?: Prisma.TripCityUncheckedCreateNestedManyWithoutTripInput
+  restaurants?: Prisma.RestaurantUncheckedCreateNestedManyWithoutTripInput
 }
 
 export type TripUpdateInput = {
@@ -398,11 +403,12 @@ export type TripUpdateInput = {
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservations?: Prisma.ReservationUpdateManyWithoutTripNestedInput
+  events?: Prisma.EventUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTripNestedInput
   participants?: Prisma.TripParticipantUpdateManyWithoutTripNestedInput
   todos?: Prisma.BookingTodoUpdateManyWithoutTripNestedInput
   cities?: Prisma.TripCityUpdateManyWithoutTripNestedInput
+  restaurants?: Prisma.RestaurantUpdateManyWithoutTripNestedInput
 }
 
 export type TripUncheckedUpdateInput = {
@@ -417,11 +423,12 @@ export type TripUncheckedUpdateInput = {
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutTripNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTripNestedInput
   participants?: Prisma.TripParticipantUncheckedUpdateManyWithoutTripNestedInput
   todos?: Prisma.BookingTodoUncheckedUpdateManyWithoutTripNestedInput
   cities?: Prisma.TripCityUncheckedUpdateManyWithoutTripNestedInput
+  restaurants?: Prisma.RestaurantUncheckedUpdateManyWithoutTripNestedInput
 }
 
 export type TripCreateManyInput = {
@@ -563,18 +570,18 @@ export type TripUpdateOneRequiredWithoutParticipantsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TripUpdateToOneWithWhereWithoutParticipantsInput, Prisma.TripUpdateWithoutParticipantsInput>, Prisma.TripUncheckedUpdateWithoutParticipantsInput>
 }
 
-export type TripCreateNestedOneWithoutReservationsInput = {
-  create?: Prisma.XOR<Prisma.TripCreateWithoutReservationsInput, Prisma.TripUncheckedCreateWithoutReservationsInput>
-  connectOrCreate?: Prisma.TripCreateOrConnectWithoutReservationsInput
+export type TripCreateNestedOneWithoutEventsInput = {
+  create?: Prisma.XOR<Prisma.TripCreateWithoutEventsInput, Prisma.TripUncheckedCreateWithoutEventsInput>
+  connectOrCreate?: Prisma.TripCreateOrConnectWithoutEventsInput
   connect?: Prisma.TripWhereUniqueInput
 }
 
-export type TripUpdateOneRequiredWithoutReservationsNestedInput = {
-  create?: Prisma.XOR<Prisma.TripCreateWithoutReservationsInput, Prisma.TripUncheckedCreateWithoutReservationsInput>
-  connectOrCreate?: Prisma.TripCreateOrConnectWithoutReservationsInput
-  upsert?: Prisma.TripUpsertWithoutReservationsInput
+export type TripUpdateOneRequiredWithoutEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.TripCreateWithoutEventsInput, Prisma.TripUncheckedCreateWithoutEventsInput>
+  connectOrCreate?: Prisma.TripCreateOrConnectWithoutEventsInput
+  upsert?: Prisma.TripUpsertWithoutEventsInput
   connect?: Prisma.TripWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.TripUpdateToOneWithWhereWithoutReservationsInput, Prisma.TripUpdateWithoutReservationsInput>, Prisma.TripUncheckedUpdateWithoutReservationsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TripUpdateToOneWithWhereWithoutEventsInput, Prisma.TripUpdateWithoutEventsInput>, Prisma.TripUncheckedUpdateWithoutEventsInput>
 }
 
 export type TripCreateNestedOneWithoutExpensesInput = {
@@ -619,6 +626,20 @@ export type TripUpdateOneRequiredWithoutTodosNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TripUpdateToOneWithWhereWithoutTodosInput, Prisma.TripUpdateWithoutTodosInput>, Prisma.TripUncheckedUpdateWithoutTodosInput>
 }
 
+export type TripCreateNestedOneWithoutRestaurantsInput = {
+  create?: Prisma.XOR<Prisma.TripCreateWithoutRestaurantsInput, Prisma.TripUncheckedCreateWithoutRestaurantsInput>
+  connectOrCreate?: Prisma.TripCreateOrConnectWithoutRestaurantsInput
+  connect?: Prisma.TripWhereUniqueInput
+}
+
+export type TripUpdateOneRequiredWithoutRestaurantsNestedInput = {
+  create?: Prisma.XOR<Prisma.TripCreateWithoutRestaurantsInput, Prisma.TripUncheckedCreateWithoutRestaurantsInput>
+  connectOrCreate?: Prisma.TripCreateOrConnectWithoutRestaurantsInput
+  upsert?: Prisma.TripUpsertWithoutRestaurantsInput
+  connect?: Prisma.TripWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TripUpdateToOneWithWhereWithoutRestaurantsInput, Prisma.TripUpdateWithoutRestaurantsInput>, Prisma.TripUncheckedUpdateWithoutRestaurantsInput>
+}
+
 export type TripCreateWithoutParticipantsInput = {
   id?: string
   name: string
@@ -631,10 +652,11 @@ export type TripCreateWithoutParticipantsInput = {
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
   createdAt?: Date | string
-  reservations?: Prisma.ReservationCreateNestedManyWithoutTripInput
+  events?: Prisma.EventCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTripInput
   todos?: Prisma.BookingTodoCreateNestedManyWithoutTripInput
   cities?: Prisma.TripCityCreateNestedManyWithoutTripInput
+  restaurants?: Prisma.RestaurantCreateNestedManyWithoutTripInput
 }
 
 export type TripUncheckedCreateWithoutParticipantsInput = {
@@ -649,10 +671,11 @@ export type TripUncheckedCreateWithoutParticipantsInput = {
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
   createdAt?: Date | string
-  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutTripInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTripInput
   todos?: Prisma.BookingTodoUncheckedCreateNestedManyWithoutTripInput
   cities?: Prisma.TripCityUncheckedCreateNestedManyWithoutTripInput
+  restaurants?: Prisma.RestaurantUncheckedCreateNestedManyWithoutTripInput
 }
 
 export type TripCreateOrConnectWithoutParticipantsInput = {
@@ -683,10 +706,11 @@ export type TripUpdateWithoutParticipantsInput = {
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservations?: Prisma.ReservationUpdateManyWithoutTripNestedInput
+  events?: Prisma.EventUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTripNestedInput
   todos?: Prisma.BookingTodoUpdateManyWithoutTripNestedInput
   cities?: Prisma.TripCityUpdateManyWithoutTripNestedInput
+  restaurants?: Prisma.RestaurantUpdateManyWithoutTripNestedInput
 }
 
 export type TripUncheckedUpdateWithoutParticipantsInput = {
@@ -701,13 +725,14 @@ export type TripUncheckedUpdateWithoutParticipantsInput = {
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutTripNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTripNestedInput
   todos?: Prisma.BookingTodoUncheckedUpdateManyWithoutTripNestedInput
   cities?: Prisma.TripCityUncheckedUpdateManyWithoutTripNestedInput
+  restaurants?: Prisma.RestaurantUncheckedUpdateManyWithoutTripNestedInput
 }
 
-export type TripCreateWithoutReservationsInput = {
+export type TripCreateWithoutEventsInput = {
   id?: string
   name: string
   description?: string | null
@@ -723,9 +748,10 @@ export type TripCreateWithoutReservationsInput = {
   participants?: Prisma.TripParticipantCreateNestedManyWithoutTripInput
   todos?: Prisma.BookingTodoCreateNestedManyWithoutTripInput
   cities?: Prisma.TripCityCreateNestedManyWithoutTripInput
+  restaurants?: Prisma.RestaurantCreateNestedManyWithoutTripInput
 }
 
-export type TripUncheckedCreateWithoutReservationsInput = {
+export type TripUncheckedCreateWithoutEventsInput = {
   id?: string
   name: string
   description?: string | null
@@ -741,25 +767,26 @@ export type TripUncheckedCreateWithoutReservationsInput = {
   participants?: Prisma.TripParticipantUncheckedCreateNestedManyWithoutTripInput
   todos?: Prisma.BookingTodoUncheckedCreateNestedManyWithoutTripInput
   cities?: Prisma.TripCityUncheckedCreateNestedManyWithoutTripInput
+  restaurants?: Prisma.RestaurantUncheckedCreateNestedManyWithoutTripInput
 }
 
-export type TripCreateOrConnectWithoutReservationsInput = {
+export type TripCreateOrConnectWithoutEventsInput = {
   where: Prisma.TripWhereUniqueInput
-  create: Prisma.XOR<Prisma.TripCreateWithoutReservationsInput, Prisma.TripUncheckedCreateWithoutReservationsInput>
+  create: Prisma.XOR<Prisma.TripCreateWithoutEventsInput, Prisma.TripUncheckedCreateWithoutEventsInput>
 }
 
-export type TripUpsertWithoutReservationsInput = {
-  update: Prisma.XOR<Prisma.TripUpdateWithoutReservationsInput, Prisma.TripUncheckedUpdateWithoutReservationsInput>
-  create: Prisma.XOR<Prisma.TripCreateWithoutReservationsInput, Prisma.TripUncheckedCreateWithoutReservationsInput>
+export type TripUpsertWithoutEventsInput = {
+  update: Prisma.XOR<Prisma.TripUpdateWithoutEventsInput, Prisma.TripUncheckedUpdateWithoutEventsInput>
+  create: Prisma.XOR<Prisma.TripCreateWithoutEventsInput, Prisma.TripUncheckedCreateWithoutEventsInput>
   where?: Prisma.TripWhereInput
 }
 
-export type TripUpdateToOneWithWhereWithoutReservationsInput = {
+export type TripUpdateToOneWithWhereWithoutEventsInput = {
   where?: Prisma.TripWhereInput
-  data: Prisma.XOR<Prisma.TripUpdateWithoutReservationsInput, Prisma.TripUncheckedUpdateWithoutReservationsInput>
+  data: Prisma.XOR<Prisma.TripUpdateWithoutEventsInput, Prisma.TripUncheckedUpdateWithoutEventsInput>
 }
 
-export type TripUpdateWithoutReservationsInput = {
+export type TripUpdateWithoutEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -775,9 +802,10 @@ export type TripUpdateWithoutReservationsInput = {
   participants?: Prisma.TripParticipantUpdateManyWithoutTripNestedInput
   todos?: Prisma.BookingTodoUpdateManyWithoutTripNestedInput
   cities?: Prisma.TripCityUpdateManyWithoutTripNestedInput
+  restaurants?: Prisma.RestaurantUpdateManyWithoutTripNestedInput
 }
 
-export type TripUncheckedUpdateWithoutReservationsInput = {
+export type TripUncheckedUpdateWithoutEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -793,6 +821,7 @@ export type TripUncheckedUpdateWithoutReservationsInput = {
   participants?: Prisma.TripParticipantUncheckedUpdateManyWithoutTripNestedInput
   todos?: Prisma.BookingTodoUncheckedUpdateManyWithoutTripNestedInput
   cities?: Prisma.TripCityUncheckedUpdateManyWithoutTripNestedInput
+  restaurants?: Prisma.RestaurantUncheckedUpdateManyWithoutTripNestedInput
 }
 
 export type TripCreateWithoutExpensesInput = {
@@ -807,10 +836,11 @@ export type TripCreateWithoutExpensesInput = {
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
   createdAt?: Date | string
-  reservations?: Prisma.ReservationCreateNestedManyWithoutTripInput
+  events?: Prisma.EventCreateNestedManyWithoutTripInput
   participants?: Prisma.TripParticipantCreateNestedManyWithoutTripInput
   todos?: Prisma.BookingTodoCreateNestedManyWithoutTripInput
   cities?: Prisma.TripCityCreateNestedManyWithoutTripInput
+  restaurants?: Prisma.RestaurantCreateNestedManyWithoutTripInput
 }
 
 export type TripUncheckedCreateWithoutExpensesInput = {
@@ -825,10 +855,11 @@ export type TripUncheckedCreateWithoutExpensesInput = {
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
   createdAt?: Date | string
-  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutTripInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutTripInput
   participants?: Prisma.TripParticipantUncheckedCreateNestedManyWithoutTripInput
   todos?: Prisma.BookingTodoUncheckedCreateNestedManyWithoutTripInput
   cities?: Prisma.TripCityUncheckedCreateNestedManyWithoutTripInput
+  restaurants?: Prisma.RestaurantUncheckedCreateNestedManyWithoutTripInput
 }
 
 export type TripCreateOrConnectWithoutExpensesInput = {
@@ -859,10 +890,11 @@ export type TripUpdateWithoutExpensesInput = {
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservations?: Prisma.ReservationUpdateManyWithoutTripNestedInput
+  events?: Prisma.EventUpdateManyWithoutTripNestedInput
   participants?: Prisma.TripParticipantUpdateManyWithoutTripNestedInput
   todos?: Prisma.BookingTodoUpdateManyWithoutTripNestedInput
   cities?: Prisma.TripCityUpdateManyWithoutTripNestedInput
+  restaurants?: Prisma.RestaurantUpdateManyWithoutTripNestedInput
 }
 
 export type TripUncheckedUpdateWithoutExpensesInput = {
@@ -877,10 +909,11 @@ export type TripUncheckedUpdateWithoutExpensesInput = {
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutTripNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutTripNestedInput
   participants?: Prisma.TripParticipantUncheckedUpdateManyWithoutTripNestedInput
   todos?: Prisma.BookingTodoUncheckedUpdateManyWithoutTripNestedInput
   cities?: Prisma.TripCityUncheckedUpdateManyWithoutTripNestedInput
+  restaurants?: Prisma.RestaurantUncheckedUpdateManyWithoutTripNestedInput
 }
 
 export type TripCreateWithoutCitiesInput = {
@@ -895,10 +928,11 @@ export type TripCreateWithoutCitiesInput = {
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
   createdAt?: Date | string
-  reservations?: Prisma.ReservationCreateNestedManyWithoutTripInput
+  events?: Prisma.EventCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTripInput
   participants?: Prisma.TripParticipantCreateNestedManyWithoutTripInput
   todos?: Prisma.BookingTodoCreateNestedManyWithoutTripInput
+  restaurants?: Prisma.RestaurantCreateNestedManyWithoutTripInput
 }
 
 export type TripUncheckedCreateWithoutCitiesInput = {
@@ -913,10 +947,11 @@ export type TripUncheckedCreateWithoutCitiesInput = {
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
   createdAt?: Date | string
-  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutTripInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTripInput
   participants?: Prisma.TripParticipantUncheckedCreateNestedManyWithoutTripInput
   todos?: Prisma.BookingTodoUncheckedCreateNestedManyWithoutTripInput
+  restaurants?: Prisma.RestaurantUncheckedCreateNestedManyWithoutTripInput
 }
 
 export type TripCreateOrConnectWithoutCitiesInput = {
@@ -947,10 +982,11 @@ export type TripUpdateWithoutCitiesInput = {
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservations?: Prisma.ReservationUpdateManyWithoutTripNestedInput
+  events?: Prisma.EventUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTripNestedInput
   participants?: Prisma.TripParticipantUpdateManyWithoutTripNestedInput
   todos?: Prisma.BookingTodoUpdateManyWithoutTripNestedInput
+  restaurants?: Prisma.RestaurantUpdateManyWithoutTripNestedInput
 }
 
 export type TripUncheckedUpdateWithoutCitiesInput = {
@@ -965,10 +1001,11 @@ export type TripUncheckedUpdateWithoutCitiesInput = {
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutTripNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTripNestedInput
   participants?: Prisma.TripParticipantUncheckedUpdateManyWithoutTripNestedInput
   todos?: Prisma.BookingTodoUncheckedUpdateManyWithoutTripNestedInput
+  restaurants?: Prisma.RestaurantUncheckedUpdateManyWithoutTripNestedInput
 }
 
 export type TripCreateWithoutTodosInput = {
@@ -983,10 +1020,11 @@ export type TripCreateWithoutTodosInput = {
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
   createdAt?: Date | string
-  reservations?: Prisma.ReservationCreateNestedManyWithoutTripInput
+  events?: Prisma.EventCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTripInput
   participants?: Prisma.TripParticipantCreateNestedManyWithoutTripInput
   cities?: Prisma.TripCityCreateNestedManyWithoutTripInput
+  restaurants?: Prisma.RestaurantCreateNestedManyWithoutTripInput
 }
 
 export type TripUncheckedCreateWithoutTodosInput = {
@@ -1001,10 +1039,11 @@ export type TripUncheckedCreateWithoutTodosInput = {
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: string | null
   createdAt?: Date | string
-  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutTripInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTripInput
   participants?: Prisma.TripParticipantUncheckedCreateNestedManyWithoutTripInput
   cities?: Prisma.TripCityUncheckedCreateNestedManyWithoutTripInput
+  restaurants?: Prisma.RestaurantUncheckedCreateNestedManyWithoutTripInput
 }
 
 export type TripCreateOrConnectWithoutTodosInput = {
@@ -1035,10 +1074,11 @@ export type TripUpdateWithoutTodosInput = {
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservations?: Prisma.ReservationUpdateManyWithoutTripNestedInput
+  events?: Prisma.EventUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTripNestedInput
   participants?: Prisma.TripParticipantUpdateManyWithoutTripNestedInput
   cities?: Prisma.TripCityUpdateManyWithoutTripNestedInput
+  restaurants?: Prisma.RestaurantUpdateManyWithoutTripNestedInput
 }
 
 export type TripUncheckedUpdateWithoutTodosInput = {
@@ -1053,9 +1093,102 @@ export type TripUncheckedUpdateWithoutTodosInput = {
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutTripNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTripNestedInput
   participants?: Prisma.TripParticipantUncheckedUpdateManyWithoutTripNestedInput
+  cities?: Prisma.TripCityUncheckedUpdateManyWithoutTripNestedInput
+  restaurants?: Prisma.RestaurantUncheckedUpdateManyWithoutTripNestedInput
+}
+
+export type TripCreateWithoutRestaurantsInput = {
+  id?: string
+  name: string
+  description?: string | null
+  destination?: string | null
+  startDate?: Date | string | null
+  endDate?: Date | string | null
+  coverImageUrl?: string | null
+  status?: $Enums.TripStatus
+  budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  hangoutEventId?: string | null
+  createdAt?: Date | string
+  events?: Prisma.EventCreateNestedManyWithoutTripInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutTripInput
+  participants?: Prisma.TripParticipantCreateNestedManyWithoutTripInput
+  todos?: Prisma.BookingTodoCreateNestedManyWithoutTripInput
+  cities?: Prisma.TripCityCreateNestedManyWithoutTripInput
+}
+
+export type TripUncheckedCreateWithoutRestaurantsInput = {
+  id?: string
+  name: string
+  description?: string | null
+  destination?: string | null
+  startDate?: Date | string | null
+  endDate?: Date | string | null
+  coverImageUrl?: string | null
+  status?: $Enums.TripStatus
+  budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  hangoutEventId?: string | null
+  createdAt?: Date | string
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutTripInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTripInput
+  participants?: Prisma.TripParticipantUncheckedCreateNestedManyWithoutTripInput
+  todos?: Prisma.BookingTodoUncheckedCreateNestedManyWithoutTripInput
+  cities?: Prisma.TripCityUncheckedCreateNestedManyWithoutTripInput
+}
+
+export type TripCreateOrConnectWithoutRestaurantsInput = {
+  where: Prisma.TripWhereUniqueInput
+  create: Prisma.XOR<Prisma.TripCreateWithoutRestaurantsInput, Prisma.TripUncheckedCreateWithoutRestaurantsInput>
+}
+
+export type TripUpsertWithoutRestaurantsInput = {
+  update: Prisma.XOR<Prisma.TripUpdateWithoutRestaurantsInput, Prisma.TripUncheckedUpdateWithoutRestaurantsInput>
+  create: Prisma.XOR<Prisma.TripCreateWithoutRestaurantsInput, Prisma.TripUncheckedCreateWithoutRestaurantsInput>
+  where?: Prisma.TripWhereInput
+}
+
+export type TripUpdateToOneWithWhereWithoutRestaurantsInput = {
+  where?: Prisma.TripWhereInput
+  data: Prisma.XOR<Prisma.TripUpdateWithoutRestaurantsInput, Prisma.TripUncheckedUpdateWithoutRestaurantsInput>
+}
+
+export type TripUpdateWithoutRestaurantsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  destination?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
+  budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  events?: Prisma.EventUpdateManyWithoutTripNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutTripNestedInput
+  participants?: Prisma.TripParticipantUpdateManyWithoutTripNestedInput
+  todos?: Prisma.BookingTodoUpdateManyWithoutTripNestedInput
+  cities?: Prisma.TripCityUpdateManyWithoutTripNestedInput
+}
+
+export type TripUncheckedUpdateWithoutRestaurantsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  destination?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
+  budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  hangoutEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  events?: Prisma.EventUncheckedUpdateManyWithoutTripNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTripNestedInput
+  participants?: Prisma.TripParticipantUncheckedUpdateManyWithoutTripNestedInput
+  todos?: Prisma.BookingTodoUncheckedUpdateManyWithoutTripNestedInput
   cities?: Prisma.TripCityUncheckedUpdateManyWithoutTripNestedInput
 }
 
@@ -1065,19 +1198,21 @@ export type TripUncheckedUpdateWithoutTodosInput = {
  */
 
 export type TripCountOutputType = {
-  reservations: number
+  events: number
   expenses: number
   participants: number
   todos: number
   cities: number
+  restaurants: number
 }
 
 export type TripCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  reservations?: boolean | TripCountOutputTypeCountReservationsArgs
+  events?: boolean | TripCountOutputTypeCountEventsArgs
   expenses?: boolean | TripCountOutputTypeCountExpensesArgs
   participants?: boolean | TripCountOutputTypeCountParticipantsArgs
   todos?: boolean | TripCountOutputTypeCountTodosArgs
   cities?: boolean | TripCountOutputTypeCountCitiesArgs
+  restaurants?: boolean | TripCountOutputTypeCountRestaurantsArgs
 }
 
 /**
@@ -1093,8 +1228,8 @@ export type TripCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * TripCountOutputType without action
  */
-export type TripCountOutputTypeCountReservationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ReservationWhereInput
+export type TripCountOutputTypeCountEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EventWhereInput
 }
 
 /**
@@ -1125,6 +1260,13 @@ export type TripCountOutputTypeCountCitiesArgs<ExtArgs extends runtime.Types.Ext
   where?: Prisma.TripCityWhereInput
 }
 
+/**
+ * TripCountOutputType without action
+ */
+export type TripCountOutputTypeCountRestaurantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RestaurantWhereInput
+}
+
 
 export type TripSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1138,11 +1280,12 @@ export type TripSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   budget?: boolean
   hangoutEventId?: boolean
   createdAt?: boolean
-  reservations?: boolean | Prisma.Trip$reservationsArgs<ExtArgs>
+  events?: boolean | Prisma.Trip$eventsArgs<ExtArgs>
   expenses?: boolean | Prisma.Trip$expensesArgs<ExtArgs>
   participants?: boolean | Prisma.Trip$participantsArgs<ExtArgs>
   todos?: boolean | Prisma.Trip$todosArgs<ExtArgs>
   cities?: boolean | Prisma.Trip$citiesArgs<ExtArgs>
+  restaurants?: boolean | Prisma.Trip$restaurantsArgs<ExtArgs>
   _count?: boolean | Prisma.TripCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["trip"]>
 
@@ -1190,11 +1333,12 @@ export type TripSelectScalar = {
 
 export type TripOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "destination" | "startDate" | "endDate" | "coverImageUrl" | "status" | "budget" | "hangoutEventId" | "createdAt", ExtArgs["result"]["trip"]>
 export type TripInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  reservations?: boolean | Prisma.Trip$reservationsArgs<ExtArgs>
+  events?: boolean | Prisma.Trip$eventsArgs<ExtArgs>
   expenses?: boolean | Prisma.Trip$expensesArgs<ExtArgs>
   participants?: boolean | Prisma.Trip$participantsArgs<ExtArgs>
   todos?: boolean | Prisma.Trip$todosArgs<ExtArgs>
   cities?: boolean | Prisma.Trip$citiesArgs<ExtArgs>
+  restaurants?: boolean | Prisma.Trip$restaurantsArgs<ExtArgs>
   _count?: boolean | Prisma.TripCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TripIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1203,11 +1347,12 @@ export type TripIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $TripPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Trip"
   objects: {
-    reservations: Prisma.$ReservationPayload<ExtArgs>[]
+    events: Prisma.$EventPayload<ExtArgs>[]
     expenses: Prisma.$ExpensePayload<ExtArgs>[]
     participants: Prisma.$TripParticipantPayload<ExtArgs>[]
     todos: Prisma.$BookingTodoPayload<ExtArgs>[]
     cities: Prisma.$TripCityPayload<ExtArgs>[]
+    restaurants: Prisma.$RestaurantPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1615,11 +1760,12 @@ readonly fields: TripFieldRefs;
  */
 export interface Prisma__TripClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  reservations<T extends Prisma.Trip$reservationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Trip$reservationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReservationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  events<T extends Prisma.Trip$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Trip$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   expenses<T extends Prisma.Trip$expensesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Trip$expensesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExpensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   participants<T extends Prisma.Trip$participantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Trip$participantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TripParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   todos<T extends Prisma.Trip$todosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Trip$todosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BookingTodoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cities<T extends Prisma.Trip$citiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Trip$citiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TripCityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  restaurants<T extends Prisma.Trip$restaurantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Trip$restaurantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RestaurantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2053,27 +2199,27 @@ export type TripDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * Trip.reservations
+ * Trip.events
  */
-export type Trip$reservationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Trip$eventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Reservation
+   * Select specific fields to fetch from the Event
    */
-  select?: Prisma.ReservationSelect<ExtArgs> | null
+  select?: Prisma.EventSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Reservation
+   * Omit specific fields from the Event
    */
-  omit?: Prisma.ReservationOmit<ExtArgs> | null
+  omit?: Prisma.EventOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ReservationInclude<ExtArgs> | null
-  where?: Prisma.ReservationWhereInput
-  orderBy?: Prisma.ReservationOrderByWithRelationInput | Prisma.ReservationOrderByWithRelationInput[]
-  cursor?: Prisma.ReservationWhereUniqueInput
+  include?: Prisma.EventInclude<ExtArgs> | null
+  where?: Prisma.EventWhereInput
+  orderBy?: Prisma.EventOrderByWithRelationInput | Prisma.EventOrderByWithRelationInput[]
+  cursor?: Prisma.EventWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.ReservationScalarFieldEnum | Prisma.ReservationScalarFieldEnum[]
+  distinct?: Prisma.EventScalarFieldEnum | Prisma.EventScalarFieldEnum[]
 }
 
 /**
@@ -2170,6 +2316,30 @@ export type Trip$citiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.TripCityScalarFieldEnum | Prisma.TripCityScalarFieldEnum[]
+}
+
+/**
+ * Trip.restaurants
+ */
+export type Trip$restaurantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Restaurant
+   */
+  select?: Prisma.RestaurantSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Restaurant
+   */
+  omit?: Prisma.RestaurantOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RestaurantInclude<ExtArgs> | null
+  where?: Prisma.RestaurantWhereInput
+  orderBy?: Prisma.RestaurantOrderByWithRelationInput | Prisma.RestaurantOrderByWithRelationInput[]
+  cursor?: Prisma.RestaurantWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RestaurantScalarFieldEnum | Prisma.RestaurantScalarFieldEnum[]
 }
 
 /**

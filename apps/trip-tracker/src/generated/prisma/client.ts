@@ -52,20 +52,20 @@ export type Trip = Prisma.TripModel
  */
 export type TripParticipant = Prisma.TripParticipantModel
 /**
- * Model Reservation
+ * Model Event
  * 
  */
-export type Reservation = Prisma.ReservationModel
+export type Event = Prisma.EventModel
 /**
- * Model ReservationParticipant
+ * Model EventParticipant
  * 
  */
-export type ReservationParticipant = Prisma.ReservationParticipantModel
+export type EventParticipant = Prisma.EventParticipantModel
 /**
- * Model ReservationAttachment
+ * Model EventAttachment
  * 
  */
-export type ReservationAttachment = Prisma.ReservationAttachmentModel
+export type EventAttachment = Prisma.EventAttachmentModel
 /**
  * Model Expense
  * 

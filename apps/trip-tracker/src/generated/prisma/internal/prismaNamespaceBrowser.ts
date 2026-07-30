@@ -53,9 +53,9 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Trip: 'Trip',
   TripParticipant: 'TripParticipant',
-  Reservation: 'Reservation',
-  ReservationParticipant: 'ReservationParticipant',
-  ReservationAttachment: 'ReservationAttachment',
+  Event: 'Event',
+  EventParticipant: 'EventParticipant',
+  EventAttachment: 'EventAttachment',
   Expense: 'Expense',
   ExpenseParticipant: 'ExpenseParticipant',
   TripCity: 'TripCity',
@@ -109,7 +109,7 @@ export const TripParticipantScalarFieldEnum = {
 export type TripParticipantScalarFieldEnum = (typeof TripParticipantScalarFieldEnum)[keyof typeof TripParticipantScalarFieldEnum]
 
 
-export const ReservationScalarFieldEnum = {
+export const EventScalarFieldEnum = {
   id: 'id',
   tripId: 'tripId',
   type: 'type',
@@ -131,36 +131,38 @@ export const ReservationScalarFieldEnum = {
   price: 'price',
   currency: 'currency',
   notes: 'notes',
-  color: 'color',
+  url: 'url',
+  photoUrl: 'photoUrl',
+  previewTitle: 'previewTitle',
   splitMode: 'splitMode',
   paidBy: 'paidBy',
   createdAt: 'createdAt'
 } as const
 
-export type ReservationScalarFieldEnum = (typeof ReservationScalarFieldEnum)[keyof typeof ReservationScalarFieldEnum]
+export type EventScalarFieldEnum = (typeof EventScalarFieldEnum)[keyof typeof EventScalarFieldEnum]
 
 
-export const ReservationParticipantScalarFieldEnum = {
+export const EventParticipantScalarFieldEnum = {
   id: 'id',
-  reservationId: 'reservationId',
+  eventId: 'eventId',
   friendId: 'friendId',
   inSplit: 'inSplit',
   splitValue: 'splitValue'
 } as const
 
-export type ReservationParticipantScalarFieldEnum = (typeof ReservationParticipantScalarFieldEnum)[keyof typeof ReservationParticipantScalarFieldEnum]
+export type EventParticipantScalarFieldEnum = (typeof EventParticipantScalarFieldEnum)[keyof typeof EventParticipantScalarFieldEnum]
 
 
-export const ReservationAttachmentScalarFieldEnum = {
+export const EventAttachmentScalarFieldEnum = {
   id: 'id',
-  reservationId: 'reservationId',
+  eventId: 'eventId',
   filename: 'filename',
   originalName: 'originalName',
   mimeType: 'mimeType',
   createdAt: 'createdAt'
 } as const
 
-export type ReservationAttachmentScalarFieldEnum = (typeof ReservationAttachmentScalarFieldEnum)[keyof typeof ReservationAttachmentScalarFieldEnum]
+export type EventAttachmentScalarFieldEnum = (typeof EventAttachmentScalarFieldEnum)[keyof typeof EventAttachmentScalarFieldEnum]
 
 
 export const ExpenseScalarFieldEnum = {
@@ -219,6 +221,7 @@ export type BookingTodoScalarFieldEnum = (typeof BookingTodoScalarFieldEnum)[key
 
 export const RestaurantScalarFieldEnum = {
   id: 'id',
+  tripId: 'tripId',
   name: 'name',
   cuisine: 'cuisine',
   location: 'location',

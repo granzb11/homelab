@@ -19,11 +19,12 @@ model Trip {
   budget        Decimal?          @db.Decimal(10, 2)
   hangoutEventId String?          // Friend Tracker Event id for the synced hangout
   createdAt     DateTime          @default(now())
-  reservations  Reservation[]
+  events        Event[]
   expenses      Expense[]
   participants  TripParticipant[]
   todos         BookingTodo[]
   cities        TripCity[]
+  restaurants   Restaurant[]
 }
 
 enum TripStatus {
@@ -45,10 +46,10 @@ model TripParticipant {
   @@unique([tripId, friendId])
 }
 
-model Reservation {
-  id               String                  @id @default(cuid())
+model Event {
+  id               String            @id @default(cuid())
   tripId           String
-  type             ReservationType
+  type             EventType
   title            String
   confirmationCode String?
   provider         String?
@@ -64,19 +65,21 @@ model Reservation {
   lng              Float?
   durationMinutes  Int?
   partySize        Int?
-  price            Decimal?                @db.Decimal(10, 2)
-  currency         String                  @default("USD")
+  price            Decimal?          @db.Decimal(10, 2)
+  currency         String            @default("USD")
   notes            String?
-  color            String?
-  splitMode        SplitMode               @default(EVEN)
-  paidBy           String                  @default("__you__")
-  createdAt        DateTime                @default(now())
-  trip             Trip                    @relation(fields: [tripId], references: [id], onDelete: Cascade)
-  participants     ReservationParticipant[]
-  attachments      ReservationAttachment[]
+  url              String?
+  photoUrl         String?
+  previewTitle     String?
+  splitMode        SplitMode         @default(EVEN)
+  paidBy           String            @default("__you__")
+  createdAt        DateTime          @default(now())
+  trip             Trip              @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  participants     EventParticipant[]
+  attachments      EventAttachment[]
 }
 
-enum ReservationType {
+enum EventType {
   FLIGHT
   HOTEL
   AIRBNB
@@ -97,25 +100,25 @@ enum SplitMode {
   AMOUNT
 }
 
-model ReservationParticipant {
-  id            String      @id @default(cuid())
-  reservationId String
-  friendId      String
-  inSplit       Boolean     @default(true)
-  splitValue    Decimal?    @db.Decimal(10, 2)
-  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+model EventParticipant {
+  id         String   @id @default(cuid())
+  eventId    String
+  friendId   String
+  inSplit    Boolean  @default(true)
+  splitValue Decimal? @db.Decimal(10, 2)
+  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  @@unique([reservationId, friendId])
+  @@unique([eventId, friendId])
 }
 
-model ReservationAttachment {
-  id            String      @id @default(cuid())
-  reservationId String
-  filename      String
-  originalName  String
-  mimeType      String
-  createdAt     DateTime    @default(now())
-  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+model EventAttachment {
+  id           String   @id @default(cuid())
+  eventId      String
+  filename     String
+  originalName String
+  mimeType     String
+  createdAt    DateTime @default(now())
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model Expense {
@@ -169,6 +172,7 @@ model BookingTodo {
 
 model Restaurant {
   id          String           @id @default(cuid())
+  tripId      String
   name        String
   cuisine     String?
   location    String?
@@ -179,6 +183,7 @@ model Restaurant {
   visitedAt   DateTime?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
+  trip        Trip             @relation(fields: [tripId], references: [id], onDelete: Cascade)
 }
 
 enum RestaurantStatus {

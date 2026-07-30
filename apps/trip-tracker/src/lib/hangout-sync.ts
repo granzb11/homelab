@@ -20,7 +20,7 @@ export async function syncTripHangout(tripId: string): Promise<void> {
   try {
     const trip = await prisma.trip.findUnique({
       where: { id: tripId },
-      include: { participants: true, reservations: true },
+      include: { participants: true, events: true },
     });
     if (!trip) return;
 
@@ -33,11 +33,11 @@ export async function syncTripHangout(tripId: string): Promise<void> {
       ),
     ];
 
-    // Date range: prefer the trip's own dates, otherwise derive from reservations.
-    const resStarts = trip.reservations
+    // Date range: prefer the trip's own dates, otherwise derive from events.
+    const resStarts = trip.events
       .map((r) => r.startDate)
       .filter((d): d is Date => d != null);
-    const resEnds = trip.reservations
+    const resEnds = trip.events
       .map((r) => r.endDate ?? r.startDate)
       .filter((d): d is Date => d != null);
 

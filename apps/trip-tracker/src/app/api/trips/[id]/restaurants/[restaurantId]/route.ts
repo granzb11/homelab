@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-type Ctx = { params: Promise<{ id: string }> };
+type Ctx = { params: Promise<{ id: string; restaurantId: string }> };
 
 export async function PATCH(req: NextRequest, ctx: Ctx) {
-  const { id } = await ctx.params;
+  const { restaurantId } = await ctx.params;
   const body = await req.json();
   const { name, cuisine, location, url, status, visitedWith, notes, visitedAt } = body;
 
   const restaurant = await prisma.restaurant.update({
-    where: { id },
+    where: { id: restaurantId },
     data: {
       ...(name !== undefined && { name: name.trim() }),
       ...(cuisine !== undefined && { cuisine: cuisine?.trim() || null }),
@@ -25,7 +25,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
 }
 
 export async function DELETE(_req: NextRequest, ctx: Ctx) {
-  const { id } = await ctx.params;
-  await prisma.restaurant.delete({ where: { id } });
+  const { restaurantId } = await ctx.params;
+  await prisma.restaurant.delete({ where: { id: restaurantId } });
   return new NextResponse(null, { status: 204 });
 }

@@ -41,7 +41,7 @@ export default function NewTripPage() {
   return (
     <div className="max-w-xl">
       <div className="mb-8">
-        <h1 className="font-display italic text-3xl font-bold text-ink">Plan a new trip</h1>
+        <h1 className="font-display text-3xl font-bold text-ink">Plan a new trip</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">

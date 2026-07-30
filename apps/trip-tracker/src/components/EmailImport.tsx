@@ -158,7 +158,7 @@ export default function EmailImport({
           <div className="bg-surface w-full max-w-xl border border-ink-faint">
             <div className="flex items-center justify-between px-5 py-4 border-b border-ink-faint">
               <div>
-                <h2 className="font-display italic text-lg font-semibold">Import confirmation</h2>
+                <h2 className="font-display text-lg font-semibold">Import confirmation</h2>
                 <p className="text-xs text-ink-muted mt-0.5">Paste email text or drop a screenshot / photo</p>
               </div>
               <button onClick={handleClose} className="text-ink-muted hover:text-ink">✕</button>
@@ -272,7 +272,7 @@ export default function EmailImport({
                         {KIND_LABEL[result.type] ?? result.type}
                       </span>
                     </div>
-                    <p className="font-display italic text-lg font-semibold text-ink">{result.title}</p>
+                    <p className="font-display text-lg font-semibold text-ink">{result.title}</p>
                     <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-ink-muted">
                       {"provider" in result && result.provider && (
                         <><dt>Provider</dt><dd className="text-ink">{result.provider}</dd></>

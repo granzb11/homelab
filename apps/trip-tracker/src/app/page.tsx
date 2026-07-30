@@ -20,7 +20,7 @@ export default async function HomePage() {
   const trips = await prisma.trip.findMany({
     orderBy: [{ startDate: "asc" }, { createdAt: "desc" }],
     include: {
-      _count: { select: { reservations: true, participants: true } },
+      _count: { select: { events: true, participants: true } },
       todos: { where: { bookedAt: null } },
     },
   });
@@ -34,7 +34,7 @@ export default async function HomePage() {
     <div className="space-y-10">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="font-display italic text-4xl font-bold text-ink leading-tight">
+          <h1 className="font-display text-4xl font-bold text-ink leading-tight">
             Your trips
           </h1>
           <p className="text-ink-muted text-sm mt-1">{trips.length} trip{trips.length !== 1 ? "s" : ""} tracked</p>
@@ -49,7 +49,7 @@ export default async function HomePage() {
 
       {trips.length === 0 && (
         <div className="border border-ink-faint p-12 text-center">
-          <p className="font-display italic text-2xl text-ink-muted mb-2">No trips yet</p>
+          <p className="font-display text-2xl text-ink-muted mb-2">No trips yet</p>
           <p className="text-sm text-ink-muted mb-6">Start planning your next adventure.</p>
           <Link href="/trips/new" className="bg-moss text-white text-sm px-5 py-2.5 hover:bg-moss-dark">
             Plan a trip
@@ -90,7 +90,7 @@ function TripCard({ trip }: {
     startDate: Date | null;
     endDate: Date | null;
     status: string;
-    _count: { reservations: number; participants: number };
+    _count: { events: number; participants: number };
     todos: { id: string }[];
   };
 }) {
@@ -104,7 +104,7 @@ function TripCard({ trip }: {
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="min-w-0">
-          <h3 className="font-display italic text-xl font-semibold text-ink group-hover:text-moss truncate leading-tight">
+          <h3 className="font-display text-xl font-semibold text-ink group-hover:text-moss truncate leading-tight">
             {trip.name}
           </h3>
           {trip.destination && (
@@ -122,7 +122,7 @@ function TripCard({ trip }: {
       </p>
 
       <div className="flex items-center gap-4 text-xs text-ink-muted">
-        <span>{trip._count.reservations} reservation{trip._count.reservations !== 1 ? "s" : ""}</span>
+        <span>{trip._count.events} event{trip._count.events !== 1 ? "s" : ""}</span>
         <span>{trip._count.participants} traveller{trip._count.participants !== 1 ? "s" : ""}</span>
         {pendingTodos > 0 && (
           <span className="ml-auto text-gold font-medium">{pendingTodos} to book</span>

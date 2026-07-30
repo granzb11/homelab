@@ -10,9 +10,9 @@
  */
 export type * from './models/Trip'
 export type * from './models/TripParticipant'
-export type * from './models/Reservation'
-export type * from './models/ReservationParticipant'
-export type * from './models/ReservationAttachment'
+export type * from './models/Event'
+export type * from './models/EventParticipant'
+export type * from './models/EventAttachment'
 export type * from './models/Expense'
 export type * from './models/ExpenseParticipant'
 export type * from './models/TripCity'

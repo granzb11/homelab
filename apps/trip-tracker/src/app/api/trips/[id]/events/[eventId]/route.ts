@@ -2,28 +2,38 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { OWNER_ID, parseSplitParticipants } from "@/lib/split";
 import { syncTripHangout } from "@/lib/hangout-sync";
+import { fetchLinkPreview } from "@/lib/og-preview";
 
-type Ctx = { params: Promise<{ id: string; reservationId: string }> };
+type Ctx = { params: Promise<{ id: string; eventId: string }> };
 
 function parseLocalDate(dateString: string): Date {
   return new Date(dateString + 'T00:00:00Z');
 }
 
 export async function PATCH(req: NextRequest, ctx: Ctx) {
-  const { id, reservationId } = await ctx.params;
+  const { id, eventId } = await ctx.params;
   const body = await req.json();
   const {
     type, title, confirmationCode, provider,
     startDate, startTime, endDate, endTime,
     startLocation, endLocation, city, state,
     durationMinutes, partySize,
-    price, currency, notes, color, splitMode, paidBy,
+    price, currency, notes, url, splitMode, paidBy,
   } = body;
 
   const participants = parseSplitParticipants(body);
 
-  const reservation = await prisma.reservation.update({
-    where: { id: reservationId },
+  let preview: { photoUrl?: string | null; previewTitle?: string | null } = {};
+  if (url !== undefined) {
+    const trimmedUrl = url?.trim() || null;
+    const existing = await prisma.event.findUnique({ where: { id: eventId }, select: { url: true } });
+    if (trimmedUrl !== (existing?.url ?? null)) {
+      preview = trimmedUrl ? await fetchLinkPreview(trimmedUrl) : { photoUrl: null, previewTitle: null };
+    }
+  }
+
+  const event = await prisma.event.update({
+    where: { id: eventId },
     data: {
       ...(type !== undefined && { type }),
       ...(title !== undefined && { title: title.trim() }),
@@ -42,7 +52,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
       ...(price !== undefined && { price: price ? parseFloat(price) : null }),
       ...(currency !== undefined && { currency }),
       ...(notes !== undefined && { notes: notes?.trim() || null }),
-      ...(color !== undefined && { color: color?.trim() || null }),
+      ...(url !== undefined && { url: url?.trim() || null, ...preview }),
       ...(splitMode !== undefined && { splitMode }),
       ...(paidBy !== undefined && { paidBy }),
       ...(participants !== null && {
@@ -55,7 +65,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
     include: { participants: true, attachments: true },
   });
 
-  // Sync reservation participants to trip participants
+  // Sync event participants to trip participants
   if (participants !== null && participants.length > 0) {
     const participantFriendIds = new Set(participants.map(p => p.friendId));
     participantFriendIds.add(OWNER_ID);
@@ -98,26 +108,26 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
 
     if (Object.keys(expenseData).length > 0) {
       await prisma.expense.update({
-        where: { id: reservationId },
+        where: { id: eventId },
         data: expenseData,
       });
     }
   } catch (err) {
     console.error("Error syncing expense:", err);
-    // Don't fail the reservation update if expense sync fails
+    // Don't fail the event update if expense sync fails
   }
 
   await syncTripHangout(id);
 
-  return NextResponse.json(reservation);
+  return NextResponse.json(event);
 }
 
 export async function DELETE(_req: NextRequest, ctx: Ctx) {
-  const { id, reservationId } = await ctx.params;
-  await prisma.reservation.delete({ where: { id: reservationId } });
+  const { id, eventId } = await ctx.params;
+  await prisma.event.delete({ where: { id: eventId } });
 
   // Also delete the corresponding expense
-  await prisma.expense.deleteMany({ where: { id: reservationId } });
+  await prisma.expense.deleteMany({ where: { id: eventId } });
 
   await syncTripHangout(id);
   return new NextResponse(null, { status: 204 });

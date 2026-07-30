@@ -18,7 +18,7 @@ export const TripStatus = {
 export type TripStatus = (typeof TripStatus)[keyof typeof TripStatus]
 
 
-export const ReservationType = {
+export const EventType = {
   FLIGHT: 'FLIGHT',
   HOTEL: 'HOTEL',
   AIRBNB: 'AIRBNB',
@@ -33,7 +33,7 @@ export const ReservationType = {
   OTHER: 'OTHER'
 } as const
 
-export type ReservationType = (typeof ReservationType)[keyof typeof ReservationType]
+export type EventType = (typeof EventType)[keyof typeof EventType]
 
 
 export const SplitMode = {

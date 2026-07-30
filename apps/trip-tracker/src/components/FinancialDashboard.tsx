@@ -206,7 +206,7 @@ import type { Friend } from "@/lib/friends";
 
 type SplitParticipantData = { friendId: string; inSplit: boolean; splitValue: string | null };
 
-type Reservation = {
+type Event = {
   id: string;
   type: string;
   title: string;
@@ -235,7 +235,7 @@ type Trip = {
   budget: string | null;
   startDate?: string | null;
   endDate?: string | null;
-  reservations: Reservation[];
+  events: Event[];
   expenses: Expense[];
   participants: { id: string }[];
 };
@@ -562,7 +562,7 @@ export default function FinancialDashboard({
         <h2 className="text-xs font-medium text-ink-muted uppercase tracking-wide">Bill splitting</h2>
         {!hasSplitData ? (
           <div className="border border-ink-faint bg-panel p-6 text-center">
-            <p className="text-sm text-ink-muted">Add prices and choose who splits each reservation to see who owes whom.</p>
+            <p className="text-sm text-ink-muted">Add prices and choose who splits each event to see who owes whom.</p>
           </div>
         ) : (
           <div className="space-y-6">

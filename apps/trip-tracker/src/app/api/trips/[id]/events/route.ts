@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { OWNER_ID, parseSplitParticipants } from "@/lib/split";
 import { syncTripHangout } from "@/lib/hangout-sync";
+import { fetchLinkPreview } from "@/lib/og-preview";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -11,12 +12,12 @@ function parseLocalDate(dateString: string): Date {
 
 export async function GET(_req: NextRequest, ctx: Ctx) {
   const { id } = await ctx.params;
-  const reservations = await prisma.reservation.findMany({
+  const events = await prisma.event.findMany({
     where: { tripId: id },
     include: { participants: true, attachments: true },
     orderBy: { startDate: "asc" },
   });
-  return NextResponse.json(reservations);
+  return NextResponse.json(events);
 }
 
 export async function POST(req: NextRequest, ctx: Ctx) {
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     startDate, startTime, endDate, endTime,
     startLocation, endLocation, city, state,
     durationMinutes, partySize,
-    price, currency, notes, color, splitMode, paidBy,
+    price, currency, notes, url, splitMode, paidBy,
   } = body;
 
   if (!type || !title?.trim()) {
@@ -35,8 +36,9 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   }
 
   const participants = parseSplitParticipants(body) ?? [];
+  const preview = url?.trim() ? await fetchLinkPreview(url.trim()) : { photoUrl: null, previewTitle: null };
 
-  const reservation = await prisma.reservation.create({
+  const event = await prisma.event.create({
     data: {
       tripId: id,
       type,
@@ -56,7 +58,8 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       price: price ? parseFloat(price) : null,
       currency: currency ?? "USD",
       notes: notes?.trim() || null,
-      color: color?.trim() || null,
+      url: url?.trim() || null,
+      ...preview,
       splitMode: splitMode ?? "EVEN",
       paidBy: paidBy ?? OWNER_ID,
       participants: {
@@ -66,11 +69,11 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     include: { participants: true, attachments: true },
   });
 
-  // Create corresponding expense for the reservation
+  // Create corresponding expense for the event
   if (price) {
     await prisma.expense.create({
       data: {
-        id: reservation.id,
+        id: event.id,
         tripId: id,
         title: title.trim(),
         amount: parseFloat(String(price)),
@@ -89,7 +92,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     });
   }
 
-  // Add reservation participants as trip participants
+  // Add event participants as trip participants
   if (participants.length > 0) {
     const participantFriendIds = new Set(participants.map(p => p.friendId));
     participantFriendIds.add(OWNER_ID); // Always include owner
@@ -108,5 +111,5 @@ export async function POST(req: NextRequest, ctx: Ctx) {
 
   await syncTripHangout(id);
 
-  return NextResponse.json(reservation, { status: 201 });
+  return NextResponse.json(event, { status: 201 });
 }

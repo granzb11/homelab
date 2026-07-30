@@ -5,7 +5,7 @@ export async function GET() {
   const trips = await prisma.trip.findMany({
     orderBy: [{ startDate: "asc" }, { createdAt: "desc" }],
     include: {
-      _count: { select: { reservations: true, participants: true } },
+      _count: { select: { events: true, participants: true } },
       todos: { where: { bookedAt: null } },
     },
   });

@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import type { Friend } from "@/lib/friends";
-import { TYPE_COLORS, BOOKING_COLORS } from "@/components/ReservationsList";
+import { TYPE_COLORS } from "@/components/EventsList";
 
-type Reservation = {
+type Event = {
   id: string;
   type: string;
   title: string;
@@ -14,74 +14,69 @@ type Reservation = {
   endLocation: string | null;
   city: string | null;
   state: string | null;
-  color: string | null;
   participants: { friendId: string }[];
 };
 
-function cityState(r: Reservation): string | null {
-  const parts = [r.city, r.state].filter(Boolean);
+function cityState(e: Event): string | null {
+  const parts = [e.city, e.state].filter(Boolean);
   return parts.length > 0 ? parts.join(", ") : null;
 }
 
-function chipColor(r: Reservation): string {
-  if (r.color) {
-    const bc = BOOKING_COLORS.find((c) => c.id === r.color);
-    if (bc) return bc.card;
-  }
-  return TYPE_COLORS[r.type] ?? "bg-panel border-ink-faint";
+function chipColor(e: Event): string {
+  return TYPE_COLORS[e.type] ?? "bg-panel border-ink-faint";
 }
 
 export default function CalendarView({
-  reservations,
+  events,
   friendMap,
 }: {
-  reservations: Reservation[];
+  events: Event[];
   friendMap: Record<string, Friend>;
 }) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  if (reservations.length === 0) {
+  if (events.length === 0) {
     return (
       <div className="border border-ink-faint p-12 text-center">
-        <p className="font-display italic text-2xl text-ink-muted">No reservations to display</p>
+        <p className="font-display text-2xl text-ink-muted">No events to display</p>
       </div>
     );
   }
 
   const today = new Date().toISOString().slice(0, 10);
 
-  const minDate = reservations.reduce((min, r) => {
-    if (!r.startDate) return min;
-    const d = r.startDate.slice(0, 10);
+  const minDate = events.reduce((min, e) => {
+    if (!e.startDate) return min;
+    const d = e.startDate.slice(0, 10);
     return d < min ? d : min;
-  }, (reservations[0]?.startDate || today).slice(0, 10));
+  }, (events[0]?.startDate || today).slice(0, 10));
 
-  const maxDate = reservations.reduce((max, r) => {
-    const d = (r.endDate || r.startDate)?.slice(0, 10);
+  const maxDate = events.reduce((max, e) => {
+    const d = (e.endDate || e.startDate)?.slice(0, 10);
     if (!d) return max;
     return d > max ? d : max;
-  }, (reservations[0]?.endDate || reservations[0]?.startDate || today).slice(0, 10));
+  }, (events[0]?.endDate || events[0]?.startDate || today).slice(0, 10));
 
   const startDate = new Date(minDate + "T00:00:00Z");
   const endDate = new Date(maxDate + "T00:00:00Z");
 
-  const days: Map<string, Reservation[]> = new Map();
-  for (const r of reservations) {
-    if (!r.startDate) continue;
-    const d = new Date(r.startDate.slice(0, 10) + "T00:00:00Z");
-    if (r.type === "HOTEL" || r.type === "AIRBNB") {
-      const end = r.endDate ? new Date(r.endDate.slice(0, 10) + "T00:00:00Z") : d;
+  const days: Map<string, Event[]> = new Map();
+  for (const e of events) {
+    if (!e.startDate) continue;
+    const d = new Date(e.startDate.slice(0, 10) + "T00:00:00Z");
+    if (e.type === "HOTEL" || e.type === "AIRBNB") {
+      const end = e.endDate ? new Date(e.endDate.slice(0, 10) + "T00:00:00Z") : d;
       const cur = new Date(d);
       while (cur <= end) {
         const key = cur.toISOString().slice(0, 10);
         if (!days.has(key)) days.set(key, []);
-        days.get(key)!.push(r);
+        days.get(key)!.push(e);
         cur.setUTCDate(cur.getUTCDate() + 1);
       }
     } else {
       const key = d.toISOString().slice(0, 10);
       if (!days.has(key)) days.set(key, []);
-      days.get(key)!.push(r);
+      days.get(key)!.push(e);
     }
   }
 
@@ -130,12 +125,12 @@ export default function CalendarView({
               >
                 <div className="font-mono text-ink mb-1">{date.getUTCDate()}</div>
                 <div className="flex flex-col gap-0.5 overflow-hidden">
-                  {items.slice(0, 3).map((r) => {
-                    const label = cityState(r);
-                    const color = chipColor(r);
+                  {items.slice(0, 3).map((e) => {
+                    const label = cityState(e);
+                    const color = chipColor(e);
                     return label ? (
                       <span
-                        key={r.id}
+                        key={e.id}
                         className={`truncate rounded-sm border px-1 py-0.5 text-ink/80 text-[10px] leading-tight ${color}`}
                         title={label}
                       >
@@ -143,9 +138,9 @@ export default function CalendarView({
                       </span>
                     ) : (
                       <span
-                        key={r.id}
+                        key={e.id}
                         className={`w-2 h-2 rounded-sm border inline-block ${color}`}
-                        title={r.title}
+                        title={e.title}
                       />
                     );
                   })}
@@ -168,10 +163,10 @@ export default function CalendarView({
               day: "numeric",
             })}
           </h3>
-          {days.get(selectedDate)!.map((r) => (
-            <div key={r.id} className="text-sm text-ink-muted p-2 bg-panel border border-ink-faint">
-              <span className="font-medium text-ink">{r.title}</span>
-              <span className="text-xs ml-2">{r.type.replace(/_/g, " ")}</span>
+          {days.get(selectedDate)!.map((e) => (
+            <div key={e.id} className="text-sm text-ink-muted p-2 bg-panel border border-ink-faint">
+              <span className="font-medium text-ink">{e.title}</span>
+              <span className="text-xs ml-2">{e.type.replace(/_/g, " ")}</span>
             </div>
           ))}
         </div>

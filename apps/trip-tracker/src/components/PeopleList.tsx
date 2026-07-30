@@ -72,7 +72,7 @@ export default function PeopleList({
 
       {participants.length === 0 && (
         <div className="border border-dashed border-ink-faint p-10 text-center">
-          <p className="font-display italic text-xl text-ink-muted mb-1">Just you so far</p>
+          <p className="font-display text-xl text-ink-muted mb-1">Just you so far</p>
           <p className="text-sm text-ink-muted">Add friends who are joining this trip.</p>
           {friends.length === 0 && (
             <p className="text-xs text-ink-muted mt-3">
@@ -114,7 +114,7 @@ export default function PeopleList({
         <div className="fixed inset-0 bg-black/40 flex items-start justify-center pt-16 px-4 z-50">
           <div className="bg-surface w-full max-w-sm border border-ink-faint">
             <div className="flex items-center justify-between px-5 py-4 border-b border-ink-faint">
-              <h2 className="font-display italic text-lg font-semibold">Add person</h2>
+              <h2 className="font-display text-lg font-semibold">Add person</h2>
               <button onClick={() => setShowForm(false)} className="text-ink-muted hover:text-ink">✕</button>
             </div>
             <form onSubmit={add} className="p-5 space-y-4">

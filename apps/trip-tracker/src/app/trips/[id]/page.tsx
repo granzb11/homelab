@@ -15,7 +15,7 @@ export default async function TripDetailPage({ params }: Ctx) {
   const trip = await prisma.trip.findUnique({
     where: { id },
     include: {
-      reservations: {
+      events: {
         include: { participants: true, attachments: true },
         orderBy: { startDate: "asc" },
       },
@@ -26,6 +26,7 @@ export default async function TripDetailPage({ params }: Ctx) {
       participants: { orderBy: { createdAt: "asc" } },
       todos: { orderBy: { createdAt: "asc" } },
       cities: { orderBy: { targetStartDate: "asc" } },
+      restaurants: { orderBy: { createdAt: "desc" } },
     },
   });
 
@@ -48,7 +49,7 @@ export default async function TripDetailPage({ params }: Ctx) {
               {trip.status.charAt(0) + trip.status.slice(1).toLowerCase()}
             </span>
           </div>
-          <h1 className="font-display italic text-4xl font-bold text-ink leading-tight">{trip.name}</h1>
+          <h1 className="font-display text-4xl font-bold text-ink leading-tight">{trip.name}</h1>
           {trip.destination && <p className="text-ink-muted mt-1">{trip.destination}</p>}
           <p className="text-sm text-ink-muted mt-1">
             {formatDateRange(trip.startDate, trip.endDate)}

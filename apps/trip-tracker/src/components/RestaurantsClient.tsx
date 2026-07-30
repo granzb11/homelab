@@ -4,6 +4,7 @@ import { useState } from "react";
 
 export type Restaurant = {
   id: string;
+  tripId: string;
   name: string;
   cuisine: string | null;
   location: string | null;
@@ -27,7 +28,7 @@ const BLANK_FORM = {
   notes: "",
 };
 
-export default function RestaurantsClient({ initialRestaurants }: { initialRestaurants: Restaurant[] }) {
+export default function RestaurantsClient({ tripId, initialRestaurants }: { tripId: string; initialRestaurants: Restaurant[] }) {
   const [restaurants, setRestaurants] = useState<Restaurant[]>(initialRestaurants);
   const [tab, setTab] = useState<Tab>("WANT_TO_GO");
   const [showForm, setShowForm] = useState(false);
@@ -47,7 +48,7 @@ export default function RestaurantsClient({ initialRestaurants }: { initialResta
     e.preventDefault();
     setSaving(true);
     try {
-      const res = await fetch("/api/restaurants", {
+      const res = await fetch(`/api/trips/${tripId}/restaurants`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -73,7 +74,7 @@ export default function RestaurantsClient({ initialRestaurants }: { initialResta
   async function markVisited(r: Restaurant) {
     setMarkingId(r.id);
     try {
-      const res = await fetch(`/api/restaurants/${r.id}`, {
+      const res = await fetch(`/api/trips/${tripId}/restaurants/${r.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "VISITED", visitedAt: new Date().toISOString() }),
@@ -90,7 +91,7 @@ export default function RestaurantsClient({ initialRestaurants }: { initialResta
   async function deleteRestaurant(id: string) {
     setDeletingId(id);
     try {
-      await fetch(`/api/restaurants/${id}`, { method: "DELETE" });
+      await fetch(`/api/trips/${tripId}/restaurants/${id}`, { method: "DELETE" });
       setRestaurants((prev) => prev.filter((r) => r.id !== id));
     } finally {
       setDeletingId(null);
