@@ -1,0 +1,11 @@
+# Go build artifacts
+/api/bin
+*.exe
+*.test
+*.out
+
+# env files
+.env*
+
+# misc
+.DS_Store
