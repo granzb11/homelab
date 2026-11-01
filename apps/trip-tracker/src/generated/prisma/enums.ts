@@ -29,6 +29,9 @@ export const EventType = {
   CITY_TOUR: 'CITY_TOUR',
   MUSEUM: 'MUSEUM',
   RESTAURANT: 'RESTAURANT',
+  BREAKFAST: 'BREAKFAST',
+  LUNCH: 'LUNCH',
+  DINNER: 'DINNER',
   ACTIVITY: 'ACTIVITY',
   OTHER: 'OTHER'
 } as const

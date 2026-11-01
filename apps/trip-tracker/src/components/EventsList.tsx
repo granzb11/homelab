@@ -42,8 +42,10 @@ export default function EventsList({
     setShowForm(true);
   }
 
-  function handleSaved(saved: Event) {
-    const next = editId
+  function handleSaved(saved: Event | Event[]) {
+    const next = Array.isArray(saved)
+      ? [...events, ...saved].sort((a, b) => (a.startDate ?? "").localeCompare(b.startDate ?? ""))
+      : editId
       ? events.map((e) => (e.id === editId ? saved : e))
       : [...events, saved].sort((a, b) =>
           (a.startDate ?? "").localeCompare(b.startDate ?? "")
@@ -154,7 +156,7 @@ export default function EventsList({
                     <span>{[e.city, e.state].filter(Boolean).join(", ")}</span>
                   )}
                   {e.provider && <span>{e.provider}</span>}
-                  {e.type === "RESTAURANT" && e.partySize && <span>👥 {e.partySize}</span>}
+                  {["RESTAURANT", "BREAKFAST", "LUNCH", "DINNER"].includes(e.type) && e.partySize && <span>👥 {e.partySize}</span>}
                   {e.confirmationCode && <span>Conf: <span className="text-ink font-medium">{e.confirmationCode}</span></span>}
                   {e.price && <span>{formatPrice(e.price, e.currency)}</span>}
                 </div>

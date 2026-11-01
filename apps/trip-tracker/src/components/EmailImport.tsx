@@ -38,6 +38,7 @@ const KIND_LABEL: Record<string, string> = {
   TRAIN: "🚂 Train", BUS: "🚌 Bus", RENTAL_CAR: "🚗 Rental car", OTHER: "📋 Other",
   FOOD_TOUR: "🍜 Food tour", CITY_TOUR: "🗺 City tour", MUSEUM: "🏛 Museum",
   RESTAURANT: "🍽 Restaurant", ACTIVITY: "🎯 Activity",
+  BREAKFAST: "🥐 Breakfast", LUNCH: "🥪 Lunch", DINNER: "🍝 Dinner",
 };
 
 type Mode = "text" | "image";

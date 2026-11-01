@@ -72,6 +72,8 @@ model Event {
   url              String?
   photoUrl         String?
   previewTitle     String?
+  routeGroupId     String?
+  routeLabel       String?
   splitMode        SplitMode         @default(EVEN)
   paidBy           String            @default("__you__")
   createdAt        DateTime          @default(now())
@@ -91,6 +93,9 @@ enum EventType {
   CITY_TOUR
   MUSEUM
   RESTAURANT
+  BREAKFAST
+  LUNCH
+  DINNER
   ACTIVITY
   OTHER
 }

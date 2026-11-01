@@ -21,10 +21,12 @@ For a BOOKING return:
   "notes": "any other useful info or null"
 }
 
+Use BREAKFAST, LUNCH, or DINNER when the reservation is clearly for that specific meal (e.g. the email mentions a meal time or the reservation time falls in that window); use RESTAURANT as a fallback when the meal isn't specified.
+
 For an EXCURSION return:
 {
   "kind": "excursion",
-  "type": "FOOD_TOUR" | "CITY_TOUR" | "MUSEUM" | "RESTAURANT" | "ACTIVITY" | "OTHER",
+  "type": "FOOD_TOUR" | "CITY_TOUR" | "MUSEUM" | "RESTAURANT" | "BREAKFAST" | "LUNCH" | "DINNER" | "ACTIVITY" | "OTHER",
   "title": "concise title",
   "location": "venue/address or null",
   "date": "YYYY-MM-DD or null",

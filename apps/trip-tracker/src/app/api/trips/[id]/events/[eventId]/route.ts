@@ -18,7 +18,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
     startDate, startTime, endDate, endTime,
     startLocation, endLocation, city, state,
     durationMinutes, partySize,
-    price, currency, notes, url, splitMode, paidBy,
+    price, currency, notes, url, routeGroupId, routeLabel, splitMode, paidBy,
   } = body;
 
   const participants = parseSplitParticipants(body);
@@ -53,6 +53,8 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
       ...(currency !== undefined && { currency }),
       ...(notes !== undefined && { notes: notes?.trim() || null }),
       ...(url !== undefined && { url: url?.trim() || null, ...preview }),
+      ...(routeGroupId !== undefined && { routeGroupId: routeGroupId?.trim() || null }),
+      ...(routeLabel !== undefined && { routeLabel: routeLabel?.trim() || null }),
       ...(splitMode !== undefined && { splitMode }),
       ...(paidBy !== undefined && { paidBy }),
       ...(participants !== null && {

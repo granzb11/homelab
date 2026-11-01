@@ -40,6 +40,8 @@ type Event = {
   url: string | null;
   photoUrl: string | null;
   previewTitle: string | null;
+  routeGroupId: string | null;
+  routeLabel: string | null;
   splitMode: string;
   paidBy: string;
   createdAt: string;
@@ -130,12 +132,12 @@ export default function TripDetailClient({
 
   const refresh = useCallback(() => router.refresh(), [router]);
 
-  function saveEvent(event: Event) {
-    const exists = trip.events.some((e) => e.id === event.id);
-    const next = (exists
-      ? trip.events.map((e) => (e.id === event.id ? event : e))
-      : [...trip.events, event]
-    ).sort((a, b) => (a.startDate ?? "").localeCompare(b.startDate ?? ""));
+  function saveEvent(saved: Event | Event[]) {
+    const incoming = Array.isArray(saved) ? saved : [saved];
+    const incomingIds = new Set(incoming.map((e) => e.id));
+    const next = [...trip.events.filter((e) => !incomingIds.has(e.id)), ...incoming].sort(
+      (a, b) => (a.startDate ?? "").localeCompare(b.startDate ?? "")
+    );
     setTrip({ ...trip, events: next });
     refresh();
   }
@@ -155,14 +157,14 @@ export default function TripDetailClient({
 
       {/* Tabs */}
       <div>
-        <div className="flex border-b border-ink-faint gap-0">
+        <div className="flex border-b border-ink-faint gap-0 overflow-x-auto overscroll-x-contain scrollbar-none snap-x snap-proximity [mask-image:linear-gradient(to_right,black_calc(100%-1.5rem),transparent)]">
           {TABS.map((tab) => {
             if (isSharedView && ["people", "restaurants"].includes(tab)) return null;
             return (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2.5 text-sm border-b-2 -mb-px ${
+                className={`px-4 py-2.5 text-sm border-b-2 -mb-px flex-shrink-0 whitespace-nowrap snap-start ${
                   activeTab === tab
                     ? "border-moss text-ink font-medium"
                     : "border-transparent text-ink hover:text-ink"

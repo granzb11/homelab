@@ -25,7 +25,7 @@ export default function EventFormModal({
   friendMap: Record<string, Friend>;
   editingEvent?: Event | null;
   prefill?: Partial<EventFormShape>;
-  onSaved: (event: Event) => void;
+  onSaved: (event: Event | Event[]) => void;
   onClose: () => void;
 }) {
   const editId = editingEvent?.id ?? null;
@@ -49,7 +49,8 @@ export default function EventFormModal({
       body: JSON.stringify({ ...form, splitParticipants: form.participants }),
     });
     if (res.ok) {
-      onSaved(await res.json());
+      const result = await res.json();
+      onSaved(result.route ? (result.events as Event[]) : (result as Event));
     }
     setSaving(false);
   }
@@ -187,7 +188,7 @@ export default function EventFormModal({
               placeholder="e.g. ABC123" className="w-full border border-ink-faint bg-surface px-3 py-2 text-sm focus:border-moss focus:outline-none" />
           </Field>
 
-          <Field label="Link (optional — listing/confirmation URL, powers the photo)">
+          <Field label="Link (optional — listing/confirmation URL, powers the photo. A multi-stop Google Maps route link adds every stop as its own event)">
             <input type="url" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })}
               placeholder="https://…" className="w-full border border-ink-faint bg-surface px-3 py-2 text-sm focus:border-moss focus:outline-none" />
           </Field>

@@ -67,6 +67,8 @@ export type EventMinAggregateOutputType = {
   url: string | null
   photoUrl: string | null
   previewTitle: string | null
+  routeGroupId: string | null
+  routeLabel: string | null
   splitMode: $Enums.SplitMode | null
   paidBy: string | null
   createdAt: Date | null
@@ -97,6 +99,8 @@ export type EventMaxAggregateOutputType = {
   url: string | null
   photoUrl: string | null
   previewTitle: string | null
+  routeGroupId: string | null
+  routeLabel: string | null
   splitMode: $Enums.SplitMode | null
   paidBy: string | null
   createdAt: Date | null
@@ -127,6 +131,8 @@ export type EventCountAggregateOutputType = {
   url: number
   photoUrl: number
   previewTitle: number
+  routeGroupId: number
+  routeLabel: number
   splitMode: number
   paidBy: number
   createdAt: number
@@ -175,6 +181,8 @@ export type EventMinAggregateInputType = {
   url?: true
   photoUrl?: true
   previewTitle?: true
+  routeGroupId?: true
+  routeLabel?: true
   splitMode?: true
   paidBy?: true
   createdAt?: true
@@ -205,6 +213,8 @@ export type EventMaxAggregateInputType = {
   url?: true
   photoUrl?: true
   previewTitle?: true
+  routeGroupId?: true
+  routeLabel?: true
   splitMode?: true
   paidBy?: true
   createdAt?: true
@@ -235,6 +245,8 @@ export type EventCountAggregateInputType = {
   url?: true
   photoUrl?: true
   previewTitle?: true
+  routeGroupId?: true
+  routeLabel?: true
   splitMode?: true
   paidBy?: true
   createdAt?: true
@@ -352,6 +364,8 @@ export type EventGroupByOutputType = {
   url: string | null
   photoUrl: string | null
   previewTitle: string | null
+  routeGroupId: string | null
+  routeLabel: string | null
   splitMode: $Enums.SplitMode
   paidBy: string
   createdAt: Date
@@ -405,6 +419,8 @@ export type EventWhereInput = {
   url?: Prisma.StringNullableFilter<"Event"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Event"> | string | null
   previewTitle?: Prisma.StringNullableFilter<"Event"> | string | null
+  routeGroupId?: Prisma.StringNullableFilter<"Event"> | string | null
+  routeLabel?: Prisma.StringNullableFilter<"Event"> | string | null
   splitMode?: Prisma.EnumSplitModeFilter<"Event"> | $Enums.SplitMode
   paidBy?: Prisma.StringFilter<"Event"> | string
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
@@ -438,6 +454,8 @@ export type EventOrderByWithRelationInput = {
   url?: Prisma.SortOrderInput | Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   previewTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  routeGroupId?: Prisma.SortOrderInput | Prisma.SortOrder
+  routeLabel?: Prisma.SortOrderInput | Prisma.SortOrder
   splitMode?: Prisma.SortOrder
   paidBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -474,6 +492,8 @@ export type EventWhereUniqueInput = Prisma.AtLeast<{
   url?: Prisma.StringNullableFilter<"Event"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Event"> | string | null
   previewTitle?: Prisma.StringNullableFilter<"Event"> | string | null
+  routeGroupId?: Prisma.StringNullableFilter<"Event"> | string | null
+  routeLabel?: Prisma.StringNullableFilter<"Event"> | string | null
   splitMode?: Prisma.EnumSplitModeFilter<"Event"> | $Enums.SplitMode
   paidBy?: Prisma.StringFilter<"Event"> | string
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
@@ -507,6 +527,8 @@ export type EventOrderByWithAggregationInput = {
   url?: Prisma.SortOrderInput | Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   previewTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  routeGroupId?: Prisma.SortOrderInput | Prisma.SortOrder
+  routeLabel?: Prisma.SortOrderInput | Prisma.SortOrder
   splitMode?: Prisma.SortOrder
   paidBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -545,6 +567,8 @@ export type EventScalarWhereWithAggregatesInput = {
   url?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
   photoUrl?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
   previewTitle?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
+  routeGroupId?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
+  routeLabel?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
   splitMode?: Prisma.EnumSplitModeWithAggregatesFilter<"Event"> | $Enums.SplitMode
   paidBy?: Prisma.StringWithAggregatesFilter<"Event"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
@@ -574,6 +598,8 @@ export type EventCreateInput = {
   url?: string | null
   photoUrl?: string | null
   previewTitle?: string | null
+  routeGroupId?: string | null
+  routeLabel?: string | null
   splitMode?: $Enums.SplitMode
   paidBy?: string
   createdAt?: Date | string
@@ -607,6 +633,8 @@ export type EventUncheckedCreateInput = {
   url?: string | null
   photoUrl?: string | null
   previewTitle?: string | null
+  routeGroupId?: string | null
+  routeLabel?: string | null
   splitMode?: $Enums.SplitMode
   paidBy?: string
   createdAt?: Date | string
@@ -638,6 +666,8 @@ export type EventUpdateInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   previewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splitMode?: Prisma.EnumSplitModeFieldUpdateOperationsInput | $Enums.SplitMode
   paidBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -671,6 +701,8 @@ export type EventUncheckedUpdateInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   previewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splitMode?: Prisma.EnumSplitModeFieldUpdateOperationsInput | $Enums.SplitMode
   paidBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -703,6 +735,8 @@ export type EventCreateManyInput = {
   url?: string | null
   photoUrl?: string | null
   previewTitle?: string | null
+  routeGroupId?: string | null
+  routeLabel?: string | null
   splitMode?: $Enums.SplitMode
   paidBy?: string
   createdAt?: Date | string
@@ -732,6 +766,8 @@ export type EventUpdateManyMutationInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   previewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splitMode?: Prisma.EnumSplitModeFieldUpdateOperationsInput | $Enums.SplitMode
   paidBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -762,6 +798,8 @@ export type EventUncheckedUpdateManyInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   previewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splitMode?: Prisma.EnumSplitModeFieldUpdateOperationsInput | $Enums.SplitMode
   paidBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -802,6 +840,8 @@ export type EventCountOrderByAggregateInput = {
   url?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
   previewTitle?: Prisma.SortOrder
+  routeGroupId?: Prisma.SortOrder
+  routeLabel?: Prisma.SortOrder
   splitMode?: Prisma.SortOrder
   paidBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -840,6 +880,8 @@ export type EventMaxOrderByAggregateInput = {
   url?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
   previewTitle?: Prisma.SortOrder
+  routeGroupId?: Prisma.SortOrder
+  routeLabel?: Prisma.SortOrder
   splitMode?: Prisma.SortOrder
   paidBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -870,6 +912,8 @@ export type EventMinOrderByAggregateInput = {
   url?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
   previewTitle?: Prisma.SortOrder
+  routeGroupId?: Prisma.SortOrder
+  routeLabel?: Prisma.SortOrder
   splitMode?: Prisma.SortOrder
   paidBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -1006,6 +1050,8 @@ export type EventCreateWithoutTripInput = {
   url?: string | null
   photoUrl?: string | null
   previewTitle?: string | null
+  routeGroupId?: string | null
+  routeLabel?: string | null
   splitMode?: $Enums.SplitMode
   paidBy?: string
   createdAt?: Date | string
@@ -1037,6 +1083,8 @@ export type EventUncheckedCreateWithoutTripInput = {
   url?: string | null
   photoUrl?: string | null
   previewTitle?: string | null
+  routeGroupId?: string | null
+  routeLabel?: string | null
   splitMode?: $Enums.SplitMode
   paidBy?: string
   createdAt?: Date | string
@@ -1098,6 +1146,8 @@ export type EventScalarWhereInput = {
   url?: Prisma.StringNullableFilter<"Event"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Event"> | string | null
   previewTitle?: Prisma.StringNullableFilter<"Event"> | string | null
+  routeGroupId?: Prisma.StringNullableFilter<"Event"> | string | null
+  routeLabel?: Prisma.StringNullableFilter<"Event"> | string | null
   splitMode?: Prisma.EnumSplitModeFilter<"Event"> | $Enums.SplitMode
   paidBy?: Prisma.StringFilter<"Event"> | string
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
@@ -1127,6 +1177,8 @@ export type EventCreateWithoutParticipantsInput = {
   url?: string | null
   photoUrl?: string | null
   previewTitle?: string | null
+  routeGroupId?: string | null
+  routeLabel?: string | null
   splitMode?: $Enums.SplitMode
   paidBy?: string
   createdAt?: Date | string
@@ -1159,6 +1211,8 @@ export type EventUncheckedCreateWithoutParticipantsInput = {
   url?: string | null
   photoUrl?: string | null
   previewTitle?: string | null
+  routeGroupId?: string | null
+  routeLabel?: string | null
   splitMode?: $Enums.SplitMode
   paidBy?: string
   createdAt?: Date | string
@@ -1205,6 +1259,8 @@ export type EventUpdateWithoutParticipantsInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   previewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splitMode?: Prisma.EnumSplitModeFieldUpdateOperationsInput | $Enums.SplitMode
   paidBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1237,6 +1293,8 @@ export type EventUncheckedUpdateWithoutParticipantsInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   previewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splitMode?: Prisma.EnumSplitModeFieldUpdateOperationsInput | $Enums.SplitMode
   paidBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1267,6 +1325,8 @@ export type EventCreateWithoutAttachmentsInput = {
   url?: string | null
   photoUrl?: string | null
   previewTitle?: string | null
+  routeGroupId?: string | null
+  routeLabel?: string | null
   splitMode?: $Enums.SplitMode
   paidBy?: string
   createdAt?: Date | string
@@ -1299,6 +1359,8 @@ export type EventUncheckedCreateWithoutAttachmentsInput = {
   url?: string | null
   photoUrl?: string | null
   previewTitle?: string | null
+  routeGroupId?: string | null
+  routeLabel?: string | null
   splitMode?: $Enums.SplitMode
   paidBy?: string
   createdAt?: Date | string
@@ -1345,6 +1407,8 @@ export type EventUpdateWithoutAttachmentsInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   previewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splitMode?: Prisma.EnumSplitModeFieldUpdateOperationsInput | $Enums.SplitMode
   paidBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1377,6 +1441,8 @@ export type EventUncheckedUpdateWithoutAttachmentsInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   previewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splitMode?: Prisma.EnumSplitModeFieldUpdateOperationsInput | $Enums.SplitMode
   paidBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1407,6 +1473,8 @@ export type EventCreateManyTripInput = {
   url?: string | null
   photoUrl?: string | null
   previewTitle?: string | null
+  routeGroupId?: string | null
+  routeLabel?: string | null
   splitMode?: $Enums.SplitMode
   paidBy?: string
   createdAt?: Date | string
@@ -1436,6 +1504,8 @@ export type EventUpdateWithoutTripInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   previewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splitMode?: Prisma.EnumSplitModeFieldUpdateOperationsInput | $Enums.SplitMode
   paidBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1467,6 +1537,8 @@ export type EventUncheckedUpdateWithoutTripInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   previewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splitMode?: Prisma.EnumSplitModeFieldUpdateOperationsInput | $Enums.SplitMode
   paidBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1498,6 +1570,8 @@ export type EventUncheckedUpdateManyWithoutTripInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   previewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routeLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splitMode?: Prisma.EnumSplitModeFieldUpdateOperationsInput | $Enums.SplitMode
   paidBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1568,6 +1642,8 @@ export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   url?: boolean
   photoUrl?: boolean
   previewTitle?: boolean
+  routeGroupId?: boolean
+  routeLabel?: boolean
   splitMode?: boolean
   paidBy?: boolean
   createdAt?: boolean
@@ -1602,6 +1678,8 @@ export type EventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   url?: boolean
   photoUrl?: boolean
   previewTitle?: boolean
+  routeGroupId?: boolean
+  routeLabel?: boolean
   splitMode?: boolean
   paidBy?: boolean
   createdAt?: boolean
@@ -1633,6 +1711,8 @@ export type EventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   url?: boolean
   photoUrl?: boolean
   previewTitle?: boolean
+  routeGroupId?: boolean
+  routeLabel?: boolean
   splitMode?: boolean
   paidBy?: boolean
   createdAt?: boolean
@@ -1664,12 +1744,14 @@ export type EventSelectScalar = {
   url?: boolean
   photoUrl?: boolean
   previewTitle?: boolean
+  routeGroupId?: boolean
+  routeLabel?: boolean
   splitMode?: boolean
   paidBy?: boolean
   createdAt?: boolean
 }
 
-export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tripId" | "type" | "title" | "confirmationCode" | "provider" | "startDate" | "startTime" | "endDate" | "endTime" | "startLocation" | "endLocation" | "city" | "state" | "lat" | "lng" | "durationMinutes" | "partySize" | "price" | "currency" | "notes" | "url" | "photoUrl" | "previewTitle" | "splitMode" | "paidBy" | "createdAt", ExtArgs["result"]["event"]>
+export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tripId" | "type" | "title" | "confirmationCode" | "provider" | "startDate" | "startTime" | "endDate" | "endTime" | "startLocation" | "endLocation" | "city" | "state" | "lat" | "lng" | "durationMinutes" | "partySize" | "price" | "currency" | "notes" | "url" | "photoUrl" | "previewTitle" | "routeGroupId" | "routeLabel" | "splitMode" | "paidBy" | "createdAt", ExtArgs["result"]["event"]>
 export type EventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   trip?: boolean | Prisma.TripDefaultArgs<ExtArgs>
   participants?: boolean | Prisma.Event$participantsArgs<ExtArgs>
@@ -1715,6 +1797,8 @@ export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     url: string | null
     photoUrl: string | null
     previewTitle: string | null
+    routeGroupId: string | null
+    routeLabel: string | null
     splitMode: $Enums.SplitMode
     paidBy: string
     createdAt: Date
@@ -2168,6 +2252,8 @@ export interface EventFieldRefs {
   readonly url: Prisma.FieldRef<"Event", 'String'>
   readonly photoUrl: Prisma.FieldRef<"Event", 'String'>
   readonly previewTitle: Prisma.FieldRef<"Event", 'String'>
+  readonly routeGroupId: Prisma.FieldRef<"Event", 'String'>
+  readonly routeLabel: Prisma.FieldRef<"Event", 'String'>
   readonly splitMode: Prisma.FieldRef<"Event", 'SplitMode'>
   readonly paidBy: Prisma.FieldRef<"Event", 'String'>
   readonly createdAt: Prisma.FieldRef<"Event", 'DateTime'>

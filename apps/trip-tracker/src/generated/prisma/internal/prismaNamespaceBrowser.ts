@@ -135,6 +135,8 @@ export const EventScalarFieldEnum = {
   url: 'url',
   photoUrl: 'photoUrl',
   previewTitle: 'previewTitle',
+  routeGroupId: 'routeGroupId',
+  routeLabel: 'routeLabel',
   splitMode: 'splitMode',
   paidBy: 'paidBy',
   createdAt: 'createdAt'

@@ -29,6 +29,8 @@ export type Event = {
   url: string | null;
   photoUrl: string | null;
   previewTitle: string | null;
+  routeGroupId: string | null;
+  routeLabel: string | null;
   splitMode: string;
   paidBy: string;
   createdAt: string;
@@ -36,11 +38,13 @@ export type Event = {
   attachments: Attachment[];
 };
 
-export const EVENT_TYPES = ["FLIGHT", "HOTEL", "AIRBNB", "TRAIN", "BUS", "RENTAL_CAR", "FOOD_TOUR", "CITY_TOUR", "MUSEUM", "RESTAURANT", "ACTIVITY", "OTHER"] as const;
+export const EVENT_TYPES = ["FLIGHT", "HOTEL", "AIRBNB", "TRAIN", "BUS", "RENTAL_CAR", "FOOD_TOUR", "CITY_TOUR", "MUSEUM", "RESTAURANT", "BREAKFAST", "LUNCH", "DINNER", "ACTIVITY", "OTHER"] as const;
 
 export const EVENT_ICONS: Record<string, string> = {
   FLIGHT: "✈", HOTEL: "🏨", AIRBNB: "🏠", TRAIN: "🚆", BUS: "🚌", RENTAL_CAR: "🚗",
-  FOOD_TOUR: "🍜", CITY_TOUR: "🗺", MUSEUM: "🏛", RESTAURANT: "🍽", ACTIVITY: "🎯", OTHER: "📋",
+  FOOD_TOUR: "🍜", CITY_TOUR: "🗺", MUSEUM: "🏛", RESTAURANT: "🍽",
+  BREAKFAST: "🥐", LUNCH: "🥪", DINNER: "🍝",
+  ACTIVITY: "🎯", OTHER: "📋",
 };
 
 // Opacity-based hue tints adapt to both the light surface and the dark ground.
@@ -55,6 +59,9 @@ export const TYPE_COLORS: Record<string, string> = {
   CITY_TOUR: "bg-cyan-500/10 border-cyan-500/25",
   MUSEUM: "bg-indigo-500/10 border-indigo-500/25",
   RESTAURANT: "bg-rose-500/10 border-rose-500/25",
+  BREAKFAST: "bg-amber-500/10 border-amber-500/25",
+  LUNCH: "bg-lime-500/10 border-lime-500/25",
+  DINNER: "bg-red-500/10 border-red-500/25",
   ACTIVITY: "bg-yellow-500/10 border-yellow-500/25",
   OTHER: "bg-panel border-ink-faint",
 };
@@ -173,6 +180,48 @@ export function getFieldConfig(type: string): FieldConfig {
         showPartySize: true,
         titlePlaceholder: "e.g. Nobu Tokyo",
       };
+    case "BREAKFAST":
+      return {
+        startDateLabel: "Reservation date",
+        endDateLabel: "",
+        startTimeLabel: "Reservation time *",
+        endTimeLabel: "",
+        startTimeRequired: true,
+        startLocationLabel: "Address",
+        endLocationLabel: null,
+        providerLabel: "Platform",
+        showDuration: false,
+        showPartySize: true,
+        titlePlaceholder: "e.g. Hotel breakfast buffet",
+      };
+    case "LUNCH":
+      return {
+        startDateLabel: "Reservation date",
+        endDateLabel: "",
+        startTimeLabel: "Reservation time *",
+        endTimeLabel: "",
+        startTimeRequired: true,
+        startLocationLabel: "Address",
+        endLocationLabel: null,
+        providerLabel: "Platform",
+        showDuration: false,
+        showPartySize: true,
+        titlePlaceholder: "e.g. Sandwich shop lunch",
+      };
+    case "DINNER":
+      return {
+        startDateLabel: "Reservation date",
+        endDateLabel: "",
+        startTimeLabel: "Reservation time *",
+        endTimeLabel: "",
+        startTimeRequired: true,
+        startLocationLabel: "Address",
+        endLocationLabel: null,
+        providerLabel: "Platform",
+        showDuration: false,
+        showPartySize: true,
+        titlePlaceholder: "e.g. Dinner at Nobu",
+      };
     case "FOOD_TOUR":
       return {
         startDateLabel: "Date",
@@ -273,6 +322,8 @@ export type EventFormShape = {
   currency: string;
   notes: string;
   url: string;
+  routeGroupId: string;
+  routeLabel: string;
   splitMode: SplitMode;
   paidBy: string;
   participants: SplitParticipant[];
@@ -297,6 +348,8 @@ export const EMPTY_FORM: EventFormShape = {
   currency: "USD",
   notes: "",
   url: "",
+  routeGroupId: "",
+  routeLabel: "",
   splitMode: "EVEN",
   paidBy: OWNER_ID,
   participants: [{ friendId: OWNER_ID, inSplit: true, splitValue: null }],
@@ -322,6 +375,8 @@ export function eventToForm(e: Event): EventFormShape {
     currency: e.currency,
     notes: e.notes ?? "",
     url: e.url ?? "",
+    routeGroupId: e.routeGroupId ?? "",
+    routeLabel: e.routeLabel ?? "",
     splitMode: e.splitMode as SplitMode,
     paidBy: e.paidBy,
     participants: e.participants.length > 0

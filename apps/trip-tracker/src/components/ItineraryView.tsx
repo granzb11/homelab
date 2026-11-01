@@ -16,6 +16,9 @@ const TYPE_TO_ACCENT: Record<string, ItineraryAccent> = {
   BUS: "transit",
   RENTAL_CAR: "transit",
   RESTAURANT: "food",
+  BREAKFAST: "food",
+  LUNCH: "food",
+  DINNER: "food",
   FOOD_TOUR: "food",
   CITY_TOUR: "activity",
   MUSEUM: "activity",
@@ -117,9 +120,38 @@ function openDirections(stay: EventEntry) {
 
 type EventEntry = Event & { stayRole?: "checkin" | "checkout" };
 type CityPlaceholderEntry = TripCity & { stayRole?: "checkin" | "checkout" };
+type RouteGroup = { routeGroupId: string; label: string; stops: EventEntry[] };
 type DayItem =
   | { kind: "event"; event: EventEntry; accent: ItineraryAccent }
-  | { kind: "placeholder"; city: CityPlaceholderEntry };
+  | { kind: "placeholder"; city: CityPlaceholderEntry }
+  | { kind: "route"; group: RouteGroup };
+
+// Events created from a multi-stop Maps link share a routeGroupId -- cluster
+// them into one route item instead of showing each stop as a separate row.
+function clusterRoutes(events: EventEntry[]): DayItem[] {
+  const groups = new Map<string, EventEntry[]>();
+  const items: DayItem[] = [];
+  for (const event of events) {
+    if (event.routeGroupId) {
+      if (!groups.has(event.routeGroupId)) groups.set(event.routeGroupId, []);
+      groups.get(event.routeGroupId)!.push(event);
+    } else {
+      items.push({ kind: "event", event, accent: TYPE_TO_ACCENT[event.type] ?? "activity" });
+    }
+  }
+  for (const [routeGroupId, stops] of groups) {
+    stops.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    const label = stops[0].routeLabel || `${stops[0].title} → ${stops[stops.length - 1].title}`;
+    items.push({ kind: "route", group: { routeGroupId, label, stops } });
+  }
+  return items;
+}
+
+function dayItemStayPriority(item: DayItem): number {
+  if (item.kind === "placeholder") return item.city.stayRole === "checkout" ? 0 : 1;
+  if (item.kind === "event") return item.event.stayRole === "checkout" ? 0 : 1;
+  return 1;
+}
 
 type CityGroup = {
   cityName: string;
@@ -282,13 +314,9 @@ function buildCitySection(group: CityGroup): CitySectionData {
 
     const items: DayItem[] = [
       ...placeholdersToday.map((city): DayItem => ({ kind: "placeholder", city })),
-      ...eventsToday.map((event): DayItem => ({ kind: "event", event, accent: TYPE_TO_ACCENT[event.type] ?? "activity" })),
+      ...clusterRoutes(eventsToday),
     ];
-    items.sort((a, b) => {
-      const aOut = (a.kind === "event" ? a.event.stayRole : a.city.stayRole) === "checkout" ? 0 : 1;
-      const bOut = (b.kind === "event" ? b.event.stayRole : b.city.stayRole) === "checkout" ? 0 : 1;
-      return aOut - bOut;
-    });
+    items.sort((a, b) => dayItemStayPriority(a) - dayItemStayPriority(b));
 
     return { dateKey, dow: dowLabel(dateKey), dnum: dnumLabel(dateKey), items };
   });
@@ -545,6 +573,118 @@ function EventCard({
   return <RowCard accent={accent} icon={icon} title={title} sub={sub} onClick={onEdit} routeStrip={routeStrip} participants={event.participants} friendMap={friendMap} />;
 }
 
+function RouteHeroCard({
+  group,
+  friendMap,
+  onEditStop,
+  onAddStop,
+}: {
+  group: RouteGroup;
+  friendMap: Record<string, Friend>;
+  onEditStop: (stop: EventEntry) => void;
+  onAddStop: () => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const { stops, label } = group;
+
+  return (
+    <div className="bg-surface border border-ink-faint rounded-[20px] overflow-hidden">
+      {!expanded ? (
+        <>
+          <div className="bg-gold-tint px-4 pt-4 pb-3 relative">
+            <span className="font-sans absolute top-3.5 left-3.5 bg-surface text-ink text-[13px] font-semibold px-[13px] py-[7px] rounded-[20px] border border-ink-faint">
+              🧭 Route
+            </span>
+            <div className="flex items-start pt-6" style={{ gap: 0 }}>
+              {stops.map((stop, i) => (
+                <div key={stop.id} className="flex flex-col items-center flex-1 relative">
+                  {i > 0 && (
+                    <div
+                      className="absolute top-1 h-px"
+                      style={{
+                        left: "-50%",
+                        width: "100%",
+                        backgroundImage: "repeating-linear-gradient(to right, var(--color-ink-faint) 0 4px, transparent 4px 8px)",
+                      }}
+                    />
+                  )}
+                  <div className="w-2.5 h-2.5 rounded-full bg-gold border-2 border-surface shadow-[0_0_0_1px_var(--color-ink-faint)] z-10" />
+                  <div className="font-sans text-[10.5px] text-ink-muted mt-1.5 text-center leading-tight px-0.5">{stop.title}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="px-5 pt-3 pb-4">
+            <h2 className="font-display text-xl font-bold tracking-tight text-ink leading-[1.22]">{label}</h2>
+            <div className="font-sans text-[13px] text-ink-muted mt-1">
+              {stops[0]?.startDate ? formatMonthDay(toLocalDateKey(parseUTCDate(stops[0].startDate))) : ""} · {stops.length} stops
+            </div>
+            <button
+              onClick={() => setExpanded(true)}
+              className="font-sans w-full mt-3.5 border border-ink-faint bg-surface text-ink text-[15px] font-bold py-[13px] rounded-[12px] hover:border-moss hover:text-moss transition-colors"
+            >
+              View all stops
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <button
+            onClick={() => setExpanded(false)}
+            className="font-sans w-full flex items-center gap-2 px-5 py-3 text-[13px] font-semibold text-moss border-b border-dashed border-ink-faint hover:bg-ink/[0.03] transition-colors"
+          >
+            <span className="text-[10px]">▾</span> {label} · {stops.length} stops
+          </button>
+          <div className="px-4 pt-3 pb-2 space-y-0">
+            {stops.map((stop, i) => (
+              <div key={stop.id} className="grid" style={{ gridTemplateColumns: "18px 1fr", columnGap: "10px" }}>
+                <div className="relative flex justify-center">
+                  <div className="w-2 h-2 rounded-full bg-gold border-2 border-surface shadow-[0_0_0_1px_var(--color-ink-faint)] z-10 mt-[15px]" />
+                  {i < stops.length - 1 && (
+                    <div
+                      className="absolute w-px"
+                      style={{
+                        top: "15px",
+                        bottom: "-7px",
+                        backgroundImage: "repeating-linear-gradient(to bottom, var(--color-ink-faint) 0 4px, transparent 4px 8px)",
+                      }}
+                    />
+                  )}
+                </div>
+                <div className="mb-[7px]">
+                  <RowCard
+                    accent="activity"
+                    icon="📍"
+                    title={stop.title}
+                    sub={stop.startTime ? formatTime12h(stop.startTime) : undefined}
+                    onClick={() => onEditStop(stop)}
+                    participants={stop.participants}
+                    friendMap={friendMap}
+                  />
+                  {!stop.startTime && (
+                    <button
+                      onClick={() => onEditStop(stop)}
+                      className="font-sans text-[11.5px] text-moss font-semibold mt-1 ml-[11px]"
+                    >
+                      + Add time
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={onAddStop}
+            className="font-sans w-[calc(100%-32px)] mx-4 mb-4 border-[1.5px] border-dashed border-ink-faint text-ink-muted text-[13px] font-semibold py-2.5 rounded-[10px] hover:border-moss hover:text-moss transition-colors"
+          >
+            ＋ Add stop
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
 // ── Planned-stop (TripCity) inline form + row ────────────────────────────────
 
 const inputCls = "w-full border border-ink-faint bg-white px-3 py-1.5 text-sm text-ink placeholder:text-ink-muted focus:border-moss focus:outline-none";
@@ -661,6 +801,7 @@ function CitySectionView({
   updateCities,
   onEditEvent,
   onAddEvent,
+  onAddStop,
   nextCityName,
   friendMap,
 }: {
@@ -672,6 +813,7 @@ function CitySectionView({
   updateCities: (cities: TripCity[]) => void;
   onEditEvent: (event: Event) => void;
   onAddEvent: (cityName: string) => void;
+  onAddStop: (group: RouteGroup, dateKey: string, cityName: string) => void;
   nextCityName: string | null;
   friendMap: Record<string, Friend>;
 }) {
@@ -697,14 +839,27 @@ function CitySectionView({
         {section.days.map((day) =>
           day.items.map((item, i) => (
             <TimelineBlock
-              key={item.kind === "event" ? `${item.event.id}-${item.event.stayRole ?? ""}` : `${item.city.id}-${item.city.stayRole ?? ""}`}
+              key={
+                item.kind === "event"
+                  ? `${item.event.id}-${item.event.stayRole ?? ""}`
+                  : item.kind === "route"
+                  ? item.group.routeGroupId
+                  : `${item.city.id}-${item.city.stayRole ?? ""}`
+              }
               dow={day.dow}
               dnum={day.dnum}
               isContinuation={i > 0}
-              accent={item.kind === "event" ? item.accent : null}
+              accent={item.kind === "event" ? item.accent : item.kind === "route" ? "activity" : null}
               muted={item.kind === "placeholder"}
             >
-              {item.kind === "placeholder" ? (
+              {item.kind === "route" ? (
+                <RouteHeroCard
+                  group={item.group}
+                  friendMap={friendMap}
+                  onEditStop={onEditEvent}
+                  onAddStop={() => onAddStop(item.group, day.dateKey, section.cityName)}
+                />
+              ) : item.kind === "placeholder" ? (
                 editingCityId === item.city.id ? (
                   <CityForm
                     tripId={tripId}
@@ -765,7 +920,7 @@ export default function ItineraryView({
   cities: TripCity[];
   friendMap: Record<string, Friend>;
   onCitiesUpdate: (cities: TripCity[]) => void;
-  onEventSaved: (event: Event) => void;
+  onEventSaved: (event: Event | Event[]) => void;
 }) {
   const [cities, setCities] = useState<TripCity[]>(initialCities);
   const [editingCityId, setEditingCityId] = useState<string | null>(null);
@@ -803,6 +958,15 @@ export default function ItineraryView({
           updateCities={updateCities}
           onEditEvent={(event) => setEditingEvent(event)}
           onAddEvent={(cityName) => setEventPrefill({ type: "ACTIVITY", city: cityName })}
+          onAddStop={(group, dateKey, cityName) =>
+            setEventPrefill({
+              type: "ACTIVITY",
+              city: cityName,
+              startDate: dateKey,
+              routeGroupId: group.routeGroupId,
+              routeLabel: group.label,
+            })
+          }
           nextCityName={i < citySections.length - 1 ? citySections[i + 1].cityName : null}
           friendMap={friendMap}
         />
