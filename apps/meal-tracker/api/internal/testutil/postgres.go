@@ -1,8 +1,11 @@
-// Package testutil provides test helpers shared across internal packages.
+//go:build integration
+
+// Package testutil provides test helpers for the integration test tier.
 package testutil
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -11,12 +14,45 @@ import (
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 )
 
-// NewTestPool starts a throwaway Postgres container, loads schema.sql into
-// it, and returns a connection pool. The container and pool are torn down
+// NewTestPool returns a connection pool with schema.sql applied, torn down
 // automatically when the test finishes.
+//
+// If TEST_DATABASE_URL is set (a CI job that already provisioned a dev
+// database), it connects there directly - no Docker needed. Otherwise it
+// starts a throwaway local Postgres container, for running `go test
+// -tags=integration ./...` on a dev machine with no other setup.
 func NewTestPool(t *testing.T) *pgxpool.Pool {
 	t.Helper()
 	ctx := context.Background()
+
+	if url := os.Getenv("TEST_DATABASE_URL"); url != "" {
+		return connectToProvisionedDB(t, ctx, url)
+	}
+	return startLocalContainer(t, ctx)
+}
+
+func connectToProvisionedDB(t *testing.T, ctx context.Context, url string) *pgxpool.Pool {
+	t.Helper()
+
+	pool, err := pgxpool.New(ctx, url)
+	if err != nil {
+		t.Fatalf("connecting to %s: %v", url, err)
+	}
+	t.Cleanup(pool.Close)
+
+	schema, err := os.ReadFile(schemaSQLPath())
+	if err != nil {
+		t.Fatalf("reading schema.sql: %v", err)
+	}
+	if _, err := pool.Exec(ctx, string(schema)); err != nil {
+		t.Fatalf("applying schema.sql: %v", err)
+	}
+
+	return pool
+}
+
+func startLocalContainer(t *testing.T, ctx context.Context) *pgxpool.Pool {
+	t.Helper()
 
 	container, err := postgres.Run(ctx, "postgres:16-alpine",
 		postgres.WithDatabase("meal_tracker_test"),

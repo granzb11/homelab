@@ -1,0 +1,59 @@
+stages:
+  - lint
+  - unit
+  - integration
+
+default:
+  image: golang:1.27
+  cache:
+    key: go-mod-cache
+    paths:
+      - .go-cache/
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go-cache
+
+lint:
+  stage: lint
+  script:
+    - cd api
+    - test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+    - go vet ./...
+
+unit-test:
+  stage: unit
+  variables:
+    # Scoped to packages meant to carry unit tests. cmd/api is pure wiring
+    # (no logic to cover); internal/recipes is the DB-access layer, covered
+    # by the integration tier instead - see internal/recipes/recipes_test.go.
+    # Add new pure-logic packages (e.g. grocery list building) here as they
+    # land.
+    COVERAGE_THRESHOLD: "80"
+  script:
+    - cd api
+    - go test ./internal/http/... -coverprofile=coverage.out
+    - go tool cover -func=coverage.out | tail -1
+    - |
+      COVERAGE=$(go tool cover -func=coverage.out | tail -1 | grep -oE '[0-9]+\.[0-9]+')
+      echo "Coverage: ${COVERAGE}% (threshold: ${COVERAGE_THRESHOLD}%)"
+      awk -v cov="$COVERAGE" -v threshold="$COVERAGE_THRESHOLD" \
+        'BEGIN { if (cov < threshold) { print "FAIL: coverage " cov "% is below the " threshold "% threshold"; exit 1 } }'
+  coverage: '/total:\s+\(statements\)\s+(\d+\.\d+)%/'
+  artifacts:
+    paths:
+      - api/coverage.out
+
+integration-test:
+  stage: integration
+  needs:
+    - unit-test
+  services:
+    - name: postgres:16-alpine
+      alias: postgres
+  variables:
+    POSTGRES_DB: meal_tracker_ci
+    POSTGRES_USER: ci
+    POSTGRES_PASSWORD: ci
+    TEST_DATABASE_URL: "postgres://ci:ci@postgres:5432/meal_tracker_ci?sslmode=disable"
+  script:
+    - cd api
+    - go test -tags=integration ./...

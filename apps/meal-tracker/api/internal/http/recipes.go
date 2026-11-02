@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -8,11 +9,23 @@ import (
 	"mealtracker/api/internal/recipes"
 )
 
-// RecipeHandlers adapts HTTP requests to a recipes.Store. It owns no
+// RecipeStore is what RecipeHandlers needs from a recipe backend. It's
+// defined here (the consumer), not in internal/recipes, so unit tests can
+// swap in a fake instead of a real database. *recipes.Store satisfies this
+// implicitly.
+type RecipeStore interface {
+	List(ctx context.Context) ([]recipes.Recipe, error)
+	Create(ctx context.Context, in recipes.CreateInput) (recipes.Recipe, error)
+	Get(ctx context.Context, id string) (recipes.Recipe, error)
+	Update(ctx context.Context, id string, in recipes.UpdateInput) (recipes.Recipe, error)
+	Delete(ctx context.Context, id string) error
+}
+
+// RecipeHandlers adapts HTTP requests to a RecipeStore. It owns no
 // business logic itself - just request decoding, status codes, and
 // response encoding.
 type RecipeHandlers struct {
-	Recipes *recipes.Store
+	Recipes RecipeStore
 }
 
 func (h *RecipeHandlers) List(w http.ResponseWriter, r *http.Request) {
